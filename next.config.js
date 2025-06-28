@@ -3,14 +3,11 @@ const nextConfig = {
   // Server external packages (moved from experimental)
   serverExternalPackages: ["groq-sdk"],
 
-  // Turbopack configuration
-  turbo: {
+  // Turbopack configuration (correct key name)
+  turbopack: {
     resolveAlias: {
-      // Suppress punycode deprecation warning in Turbopack
-      punycode: false,
-    },
-    loaders: {
-      // Configure loaders if needed
+      // Alias punycode to an empty module to suppress warnings
+      punycode: require.resolve("./empty-module.js"),
     },
   },
 
