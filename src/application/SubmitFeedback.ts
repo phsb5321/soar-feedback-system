@@ -1,6 +1,6 @@
 // Application Use Case: SubmitFeedback
-import { Feedback } from "../domain/Feedback";
-import { FeedbackRepositoryPort } from "../ports/FeedbackRepositoryPort";
+import { Feedback } from "@/domain/Feedback";
+import { FeedbackRepositoryPort } from "@/ports/FeedbackRepositoryPort";
 
 export class SubmitFeedback {
   constructor(private feedbackRepo: FeedbackRepositoryPort) {}

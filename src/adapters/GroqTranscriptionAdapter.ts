@@ -1,6 +1,6 @@
 import fs from "fs";
 import Groq from "groq-sdk";
-import { TranscriptionPort } from "../ports/TranscriptionPort";
+import { TranscriptionPort } from "@/ports/TranscriptionPort";
 
 export class GroqTranscriptionAdapter implements TranscriptionPort {
   private groq: Groq;

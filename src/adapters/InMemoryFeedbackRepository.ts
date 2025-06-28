@@ -1,5 +1,5 @@
 // Example adapter for FeedbackRepositoryPort (in-memory)
-import { FeedbackRepositoryPort } from "../ports/FeedbackRepositoryPort";
+import { FeedbackRepositoryPort } from "@/ports/FeedbackRepositoryPort";
 
 const feedbacks: Array<{
   id: string;
