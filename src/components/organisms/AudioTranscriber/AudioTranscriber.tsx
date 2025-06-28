@@ -98,7 +98,7 @@ export function AudioTranscriber({ onTranscribe }: AudioTranscriberProps) {
   };
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full">
+    <div className="flex flex-col items-center gap-4 sm:gap-5 md:gap-6 w-full max-w-full">
       <RecordButton
         isRecording={recording}
         onToggleRecord={toggleRecording}
