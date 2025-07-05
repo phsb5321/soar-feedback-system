@@ -3,9 +3,11 @@
 export const TTS_AUDIO_URLS = {
   welcome: "/api/tts?text=Olá! Vamos começar sua avaliação.",
   speakNow: "/api/tts?text=Agora fale o que deseja compartilhar.",
-  npsQuestion: "/api/tts?text=Gostaria de avaliar sua experiência com uma nota de 0 a 10?",
+  npsQuestion:
+    "/api/tts?text=Gostaria de avaliar sua experiência com uma nota de 0 a 10?",
   npsInstructions: "/api/tts?text=Como você avalia sua experiência? De 0 a 10.",
-  additionalComment: "/api/tts?text=Gostaria de deixar um comentário adicional por voz?",
+  additionalComment:
+    "/api/tts?text=Gostaria de deixar um comentário adicional por voz?",
   thanks: "/api/tts?text=Obrigado por sua participação!",
 };
 
@@ -16,7 +18,7 @@ export const getTTSAudioUrl = (text: string): string => {
   // 1. Call a TTS service (Google Cloud TTS, ElevenLabs, etc.)
   // 2. Return the generated audio URL
   // 3. Cache the results for performance
-  
+
   console.log("TTS requested for:", text);
   return "";
 };

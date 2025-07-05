@@ -3,46 +3,6 @@ import { Text } from "@/components/atoms";
 import { SimpleFeedbackForm } from "@/components/organisms";
 import { Box } from "@mui/material";
 
-async function transcribeAudio(audioBlob: Blob): Promise<string> {
-  const formData = new FormData();
-  formData.append("audio", audioBlob, "audio.webm");
-  const res = await fetch("/api/transcribe", {
-    method: "POST",
-    body: formData,
-  });
-  if (!res.ok) return "Erro ao transcrever áudio.";
-  const data = await res.json();
-  return data.text || "Sem resultado.";
-}
-
-async function sendFeedback(feedbackData: {
-  audioBlob: Blob;
-  transcription: string;
-  npsScore?: number;
-  additionalComment?: string;
-}): Promise<void> {
-  const formData = new FormData();
-  formData.append("audio", feedbackData.audioBlob);
-  formData.append("transcription", feedbackData.transcription);
-  
-  if (feedbackData.npsScore !== undefined) {
-    formData.append("npsScore", feedbackData.npsScore.toString());
-  }
-  
-  if (feedbackData.additionalComment !== undefined) {
-    formData.append("additionalComment", feedbackData.additionalComment);
-  }
-
-  const res = await fetch("/api/feedback", {
-    method: "POST",
-    body: formData,
-  });
-  
-  if (!res.ok) {
-    throw new Error("Failed to send feedback");
-  }
-}
-
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 transition-colors duration-500 px-4 py-8 sm:px-6 lg:px-8">
@@ -78,10 +38,7 @@ export default function Home() {
           <div className="mt-3 sm:mt-4 w-16 sm:w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto opacity-60" />
         </div>
 
-        <SimpleFeedbackForm
-          onTranscribe={transcribeAudio}
-          onSendFeedback={sendFeedback}
-        />
+        <SimpleFeedbackForm />
 
         <div className="mt-6 sm:mt-8 text-center space-y-2">
           <Text
