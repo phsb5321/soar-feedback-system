@@ -18,4 +18,5 @@ export const getTTSAudioUrl = (text: string): string => {
   // 3. Cache the results for performance
   
   console.log("TTS requested for:", text);
- 
+  return "";
+};

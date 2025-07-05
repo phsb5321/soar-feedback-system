@@ -1,6 +1,6 @@
 "use client";
 import { Text } from "@/components/atoms";
-import { FeedbackFlow } from "@/components/organisms";
+import { SimpleFeedbackForm } from "@/components/organisms";
 import { Box } from "@mui/material";
 
 async function transcribeAudio(audioBlob: Blob): Promise<string> {
@@ -15,7 +15,12 @@ async function transcribeAudio(audioBlob: Blob): Promise<string> {
   return data.text || "Sem resultado.";
 }
 
-async function sendFeedback(feedbackData: any): Promise<void> {
+async function sendFeedback(feedbackData: {
+  audioBlob: Blob;
+  transcription: string;
+  npsScore?: number;
+  additionalComment?: string;
+}): Promise<void> {
   const formData = new FormData();
   formData.append("audio", feedbackData.audioBlob);
   formData.append("transcription", feedbackData.transcription);
@@ -73,7 +78,7 @@ export default function Home() {
           <div className="mt-3 sm:mt-4 w-16 sm:w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto opacity-60" />
         </div>
 
-        <FeedbackFlow
+        <SimpleFeedbackForm
           onTranscribe={transcribeAudio}
           onSendFeedback={sendFeedback}
         />
