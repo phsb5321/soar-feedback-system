@@ -21,7 +21,7 @@ export class GroqServerTranscriptionAdapter {
       });
 
       if (!transcription.text) {
-        throw new Error('No transcription text received from Groq service');
+        throw new Error("No transcription text received from Groq service");
       }
 
       return transcription.text;
@@ -29,7 +29,7 @@ export class GroqServerTranscriptionAdapter {
       if (error instanceof Error) {
         throw new Error(`Groq transcription error: ${error.message}`);
       }
-      throw new Error('Unknown error occurred during Groq transcription');
+      throw new Error("Unknown error occurred during Groq transcription");
     }
   }
 }

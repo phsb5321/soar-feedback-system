@@ -1,11 +1,11 @@
-import { Icon } from '@/components/atoms/Icon/Icon';
+import { Icon } from "@/components/atoms/Icon/Icon";
 
 export interface AudioRecordingButtonProps {
   isRecording: boolean;
   isDisabled?: boolean;
   onStartRecording: () => void;
   onStopRecording: () => void;
-  size?: 'small' | 'medium' | 'large';
+  size?: "small" | "medium" | "large";
   className?: string;
 }
 
@@ -18,13 +18,13 @@ export function AudioRecordingButton({
   isDisabled = false,
   onStartRecording,
   onStopRecording,
-  size = 'large',
-  className = '',
+  size = "large",
+  className = "",
 }: AudioRecordingButtonProps) {
   const sizeClasses = {
-    small: 'w-12 h-12',
-    medium: 'w-16 h-16',
-    large: 'w-24 h-24',
+    small: "w-12 h-12",
+    medium: "w-16 h-16",
+    large: "w-24 h-24",
   };
 
   const iconSizes = {
@@ -35,7 +35,7 @@ export function AudioRecordingButton({
 
   const handleClick = () => {
     if (isDisabled) return;
-    
+
     if (isRecording) {
       onStopRecording();
     } else {
@@ -51,15 +51,16 @@ export function AudioRecordingButton({
         ${sizeClasses[size]} 
         rounded-full flex items-center justify-center
         transition-all duration-300 transform hover:scale-105
-        ${isRecording 
-          ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
-          : 'bg-blue-500 hover:bg-blue-600'
+        ${
+          isRecording
+            ? "bg-red-500 hover:bg-red-600 animate-pulse"
+            : "bg-blue-500 hover:bg-blue-600"
         }
-        ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+        ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}
         text-white shadow-lg
         ${className}
       `}
-      aria-label={isRecording ? 'Stop recording' : 'Start recording'}
+      aria-label={isRecording ? "Stop recording" : "Start recording"}
     >
       {isRecording ? (
         <div className="w-6 h-6 bg-white rounded-sm" />

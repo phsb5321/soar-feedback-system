@@ -1,5 +1,8 @@
-import { AudioFeedback } from '@/domain/AudioFeedback';
-import { AudioTranscriptionPort, FeedbackSubmissionPort } from '@/ports/AudioFeedbackPorts';
+import { AudioFeedback } from "@/domain/AudioFeedback";
+import {
+  AudioTranscriptionPort,
+  FeedbackSubmissionPort,
+} from "@/ports/AudioFeedbackPorts";
 
 /**
  * Use case for submitting audio feedback
@@ -25,8 +28,10 @@ export class SubmitAudioFeedbackUseCase {
   ): Promise<AudioFeedback> {
     try {
       // First transcribe the audio
-      const transcription = await this.transcriptionPort.transcribeAudio(audioBlob);
-      
+      const transcription = await this.transcriptionPort.transcribeAudio(
+        audioBlob
+      );
+
       // Create domain entity
       const audioFeedback = new AudioFeedback(
         this.generateId(),
@@ -49,7 +54,9 @@ export class SubmitAudioFeedbackUseCase {
       if (error instanceof Error) {
         throw new Error(`Audio feedback submission failed: ${error.message}`);
       }
-      throw new Error('Unknown error occurred during audio feedback submission');
+      throw new Error(
+        "Unknown error occurred during audio feedback submission"
+      );
     }
   }
 

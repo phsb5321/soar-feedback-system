@@ -1,2 +1,2 @@
-export { AudioRecordingSection } from './AudioRecordingSection';
-export type { AudioRecordingSectionProps } from './AudioRecordingSection';
+export { AudioRecordingSection } from "./AudioRecordingSection";
+export type { AudioRecordingSectionProps } from "./AudioRecordingSection";

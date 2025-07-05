@@ -1,16 +1,16 @@
 "use client";
-import { useState } from 'react';
-import { Paper } from '@mui/material';
-import { Button } from '@/components/atoms/Button/Button';
-import { Icon } from '@/components/atoms/Icon/Icon';
-import { Text } from '@/components/atoms/Text/Text';
-import { ErrorMessage } from '@/components/atoms/ErrorMessage/ErrorMessage';
-import { 
-  AudioRecordingSection, 
-  TranscriptionDisplaySection, 
-  FeedbackFormSection 
-} from '@/components/molecules';
-import { useAudioFeedback } from '@/hooks/useAudioFeedback';
+import { Button } from "@/components/atoms/Button/Button";
+import { ErrorMessage } from "@/components/atoms/ErrorMessage/ErrorMessage";
+import { Icon } from "@/components/atoms/Icon/Icon";
+import { Text } from "@/components/atoms/Text/Text";
+import {
+  AudioRecordingSection,
+  FeedbackFormSection,
+  TranscriptionDisplaySection,
+} from "@/components/molecules";
+import { useAudioFeedback } from "@/hooks/useAudioFeedback";
+import { Paper } from "@mui/material";
+import { useState } from "react";
 
 export interface SimpleFeedbackFormProps {
   className?: string;
@@ -20,9 +20,11 @@ export interface SimpleFeedbackFormProps {
  * Organism component for the complete feedback form
  * Follows Single Responsibility Principle and uses composition
  */
-export function SimpleFeedbackForm({ className = '' }: SimpleFeedbackFormProps) {
+export function SimpleFeedbackForm({
+  className = "",
+}: SimpleFeedbackFormProps) {
   const [npsScore, setNpsScore] = useState<number | null>(null);
-  const [additionalComment, setAdditionalComment] = useState('');
+  const [additionalComment, setAdditionalComment] = useState("");
 
   const {
     isRecording,
@@ -45,7 +47,7 @@ export function SimpleFeedbackForm({ className = '' }: SimpleFeedbackFormProps) 
   const handleReset = () => {
     resetForm();
     setNpsScore(null);
-    setAdditionalComment('');
+    setAdditionalComment("");
   };
 
   if (isSuccess) {
@@ -55,32 +57,35 @@ export function SimpleFeedbackForm({ className = '' }: SimpleFeedbackFormProps) 
         sx={{
           p: { xs: 4, sm: 6, md: 8 },
           borderRadius: { xs: 6, sm: 8 },
-          minHeight: '400px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 25px 80px 0 rgba(34, 197, 94, 0.2), 0 12px 40px 0 rgba(0, 0, 0, 0.15)',
-          background: 'rgba(255, 255, 255, 0.98)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(34, 197, 94, 0.3)',
+          minHeight: "400px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow:
+            "0 25px 80px 0 rgba(34, 197, 94, 0.2), 0 12px 40px 0 rgba(0, 0, 0, 0.15)",
+          background: "rgba(255, 255, 255, 0.98)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(34, 197, 94, 0.3)",
         }}
       >
         <div className="text-center space-y-6">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-            <Icon src="/send.svg" alt="Sucesso" size={32} className="text-green-600" />
+            <Icon
+              src="/send.svg"
+              alt="Sucesso"
+              size={32}
+              className="text-green-600"
+            />
           </div>
           <Text variant="h3" className="text-green-600 font-bold">
             Feedback Enviado com Sucesso!
           </Text>
           <Text variant="body" className="text-gray-600 max-w-md">
-            Obrigado por sua participação. Sua opinião é muito importante para nós.
+            Obrigado por sua participação. Sua opinião é muito importante para
+            nós.
           </Text>
-          <Button
-            variant="primary"
-            onClick={handleReset}
-            className="mt-8"
-          >
+          <Button variant="primary" onClick={handleReset} className="mt-8">
             Enviar Novo Feedback
           </Button>
         </div>
@@ -95,21 +100,23 @@ export function SimpleFeedbackForm({ className = '' }: SimpleFeedbackFormProps) 
         sx={{
           p: { xs: 4, sm: 6, md: 8 },
           borderRadius: { xs: 6, sm: 8 },
-          minHeight: '500px',
-          boxShadow: '0 25px 80px 0 rgba(59, 130, 246, 0.2), 0 12px 40px 0 rgba(0, 0, 0, 0.15)',
-          background: 'rgba(255, 255, 255, 0.98)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.3)',
-          position: 'relative',
-          overflow: 'hidden',
-          '&::before': {
+          minHeight: "500px",
+          boxShadow:
+            "0 25px 80px 0 rgba(59, 130, 246, 0.2), 0 12px 40px 0 rgba(0, 0, 0, 0.15)",
+          background: "rgba(255, 255, 255, 0.98)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(255, 255, 255, 0.3)",
+          position: "relative",
+          overflow: "hidden",
+          "&::before": {
             content: '""',
-            position: 'absolute',
+            position: "absolute",
             top: 0,
             left: 0,
             right: 0,
-            height: { xs: '3px', sm: '5px' },
-            background: 'linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #F59E0B)',
+            height: { xs: "3px", sm: "5px" },
+            background:
+              "linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #F59E0B)",
           },
         }}
       >
@@ -132,19 +139,23 @@ export function SimpleFeedbackForm({ className = '' }: SimpleFeedbackFormProps) 
             onStopRecording={stopRecording}
           />
 
-          {/* Transcription Display Section */}
-          <TranscriptionDisplaySection transcription={transcription} />
+          {/* Transcription Display Section - Show after recording stops */}
+          {!isRecording && transcription && (
+            <TranscriptionDisplaySection transcription={transcription} />
+          )}
 
-          {/* Feedback Form Section */}
-          <FeedbackFormSection
-            npsScore={npsScore}
-            additionalComment={additionalComment}
-            onNpsScoreChange={setNpsScore}
-            onAdditionalCommentChange={setAdditionalComment}
-            onSubmit={handleSubmit}
-            isSubmitting={isSubmitting}
-            isDisabled={!audioBlob || !transcription}
-          />
+          {/* Feedback Form Section - Show CSAT only after recording stops and transcription is available */}
+          {!isRecording && audioBlob && transcription && !isTranscribing && (
+            <FeedbackFormSection
+              npsScore={npsScore}
+              additionalComment={additionalComment}
+              onNpsScoreChange={setNpsScore}
+              onAdditionalCommentChange={setAdditionalComment}
+              onSubmit={handleSubmit}
+              isSubmitting={isSubmitting}
+              isDisabled={!audioBlob || !transcription}
+            />
+          )}
 
           {/* Error Display */}
           {error && (

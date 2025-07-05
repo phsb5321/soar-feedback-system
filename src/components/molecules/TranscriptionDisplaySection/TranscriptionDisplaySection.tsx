@@ -1,4 +1,4 @@
-import { Text } from '@/components/atoms/Text/Text';
+import { Text } from "@/components/atoms/Text/Text";
 
 export interface TranscriptionDisplaySectionProps {
   transcription: string;
@@ -11,7 +11,7 @@ export interface TranscriptionDisplaySectionProps {
  */
 export function TranscriptionDisplaySection({
   transcription,
-  className = '',
+  className = "",
 }: TranscriptionDisplaySectionProps) {
   if (!transcription) return null;
 
@@ -20,7 +20,7 @@ export function TranscriptionDisplaySection({
       <Text variant="h3" className="font-semibold text-gray-700">
         2. Transcrição do seu feedback
       </Text>
-      
+
       <div className="bg-gray-50 rounded-lg p-4 border">
         <Text variant="body" className="text-gray-800 whitespace-pre-line">
           {transcription}

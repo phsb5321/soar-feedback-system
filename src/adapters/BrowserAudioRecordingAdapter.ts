@@ -1,4 +1,4 @@
-import { AudioRecordingPort } from '@/ports/AudioFeedbackPorts';
+import { AudioRecordingPort } from "@/ports/AudioFeedbackPorts";
 
 /**
  * Adapter for browser audio recording
@@ -9,21 +9,23 @@ export class BrowserAudioRecordingAdapter implements AudioRecordingPort {
 
   async startRecording(): Promise<MediaRecorder> {
     try {
-      this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
       const mediaRecorder = new MediaRecorder(this.mediaStream);
       return mediaRecorder;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Recording start error: ${error.message}`);
       }
-      throw new Error('Unknown recording start error occurred');
+      throw new Error("Unknown recording start error occurred");
     }
   }
 
   async stopRecording(recorder: MediaRecorder): Promise<Blob> {
     return new Promise((resolve, reject) => {
       const chunks: BlobPart[] = [];
-      
+
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunks.push(event.data);
@@ -32,28 +34,38 @@ export class BrowserAudioRecordingAdapter implements AudioRecordingPort {
 
       recorder.onstop = () => {
         try {
-          const blob = new Blob(chunks, { type: 'audio/webm' });
-          
+          const blob = new Blob(chunks, { type: "audio/webm" });
+
           // Clean up media stream
           if (this.mediaStream) {
-            this.mediaStream.getTracks().forEach(track => track.stop());
+            this.mediaStream.getTracks().forEach((track) => track.stop());
             this.mediaStream = null;
           }
-          
+
           resolve(blob);
         } catch (error) {
-          reject(error instanceof Error ? error : new Error('Unknown recording stop error'));
+          reject(
+            error instanceof Error
+              ? error
+              : new Error("Unknown recording stop error")
+          );
         }
       };
 
       recorder.onerror = (event) => {
-        reject(new Error(`Recording error: ${event.error?.message || 'Unknown error'}`));
+        reject(
+          new Error(
+            `Recording error: ${event.error?.message || "Unknown error"}`
+          )
+        );
       };
 
       try {
         recorder.stop();
       } catch (error) {
-        reject(error instanceof Error ? error : new Error('Failed to stop recording'));
+        reject(
+          error instanceof Error ? error : new Error("Failed to stop recording")
+        );
       }
     });
   }

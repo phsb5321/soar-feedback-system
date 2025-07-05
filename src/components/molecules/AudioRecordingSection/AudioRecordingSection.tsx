@@ -1,6 +1,6 @@
-import { Text } from '@/components/atoms/Text/Text';
-import { AudioRecordingButton } from '@/components/atoms/AudioRecordingButton/AudioRecordingButton';
-import { LoadingSpinner } from '@/components/atoms/LoadingSpinner/LoadingSpinner';
+import { AudioRecordingButton } from "@/components/atoms/AudioRecordingButton/AudioRecordingButton";
+import { LoadingSpinner } from "@/components/atoms/LoadingSpinner/LoadingSpinner";
+import { Text } from "@/components/atoms/Text/Text";
 
 export interface AudioRecordingSectionProps {
   isRecording: boolean;
@@ -19,18 +19,18 @@ export function AudioRecordingSection({
   isTranscribing,
   onStartRecording,
   onStopRecording,
-  className = '',
+  className = "",
 }: AudioRecordingSectionProps) {
   const getStatusText = () => {
-    if (isTranscribing) return 'Transcrevendo áudio...';
-    if (isRecording) return 'Gravando... Clique para parar';
-    return 'Clique para gravar';
+    if (isTranscribing) return "Transcrevendo áudio...";
+    if (isRecording) return "Gravando... Clique para parar";
+    return "Clique para gravar";
   };
 
   const getStatusColor = () => {
-    if (isTranscribing) return 'text-blue-600';
-    if (isRecording) return 'text-red-600';
-    return 'text-gray-600';
+    if (isTranscribing) return "text-blue-600";
+    if (isRecording) return "text-red-600";
+    return "text-gray-600";
   };
 
   return (
@@ -38,7 +38,7 @@ export function AudioRecordingSection({
       <Text variant="h3" className="font-semibold text-gray-700">
         1. Grave seu feedback
       </Text>
-      
+
       <div className="flex flex-col items-center space-y-4">
         <AudioRecordingButton
           isRecording={isRecording}

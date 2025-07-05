@@ -39,7 +39,7 @@ export interface AudioRecordingPort {
    * @returns Promise resolving to MediaRecorder instance
    */
   startRecording(): Promise<MediaRecorder>;
-  
+
   /**
    * Stop recording audio
    * @param recorder - The MediaRecorder instance

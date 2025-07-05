@@ -11,7 +11,7 @@ export interface ErrorMessageProps {
 export function ErrorMessage({
   message,
   onDismiss,
-  className = '',
+  className = "",
 }: ErrorMessageProps) {
   return (
     <div
@@ -38,7 +38,7 @@ export function ErrorMessage({
         </div>
         <p className="text-red-700 text-sm font-medium">{message}</p>
       </div>
-      
+
       {onDismiss && (
         <button
           onClick={onDismiss}

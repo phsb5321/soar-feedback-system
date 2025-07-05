@@ -65,12 +65,14 @@ src/
 ### 1. Hexagonal Architecture (Ports & Adapters)
 
 **Ports** (Interfaces):
+
 - `AudioTranscriptionPort`: Contract for audio transcription services
-- `FeedbackSubmissionPort`: Contract for feedback submission services  
+- `FeedbackSubmissionPort`: Contract for feedback submission services
 - `AudioRecordingPort`: Contract for audio recording services
 - `FeedbackRepositoryPort`: Contract for feedback storage
 
 **Adapters** (Implementations):
+
 - `GroqTranscriptionAdapter`: Groq API implementation for transcription
 - `RestFeedbackSubmissionAdapter`: REST API implementation for feedback submission
 - `BrowserAudioRecordingAdapter`: Web Audio API implementation for recording
@@ -79,39 +81,47 @@ src/
 ### 2. Atomic Design
 
 **Atoms** (Basic UI elements):
+
 - `AudioRecordingButton`: Single-purpose recording button
 - `ErrorMessage`: Reusable error display component
 - `LoadingSpinner`: Reusable loading indicator
 - `Button`, `Icon`, `Text`: Basic UI primitives
 
 **Molecules** (Combinations of atoms):
+
 - `AudioRecordingSection`: Recording functionality with status
 - `TranscriptionDisplaySection`: Transcription display logic
 - `FeedbackFormSection`: Form inputs and validation
 
 **Organisms** (Complex components):
+
 - `SimpleFeedbackForm`: Complete feedback form workflow
 
 ### 3. SOLID Principles
 
 **Single Responsibility Principle (SRP)**:
+
 - Each class/component has one reason to change
 - `TranscribeAudioUseCase` only handles transcription logic
 - `AudioRecordingButton` only handles recording button UI
 
 **Open/Closed Principle (OCP)**:
+
 - Components are open for extension, closed for modification
 - New transcription providers can be added by implementing `AudioTranscriptionPort`
 
 **Liskov Substitution Principle (LSP)**:
+
 - Adapters can be substituted without breaking functionality
 - Any `AudioTranscriptionPort` implementation works interchangeably
 
 **Interface Segregation Principle (ISP)**:
+
 - Ports are focused and specific to their use case
 - `AudioTranscriptionPort` only defines transcription methods
 
 **Dependency Inversion Principle (DIP)**:
+
 - High-level modules don't depend on low-level modules
 - Use cases depend on port interfaces, not concrete implementations
 
@@ -145,15 +155,18 @@ UI Component → Custom Hook → Service Layer → Use Case → Port → Adapter
 ## 🧪 Testing Strategy
 
 ### Unit Tests
+
 - **Domain entities**: Test business logic in `AudioFeedback`
 - **Use cases**: Test business workflows in isolation
 - **Adapters**: Test external service integration
 
 ### Integration Tests
+
 - **Service layer**: Test complete workflows
 - **API routes**: Test end-to-end API functionality
 
 ### Component Tests
+
 - **Atoms**: Test individual component behavior
 - **Molecules**: Test component composition
 - **Organisms**: Test complex user workflows
@@ -163,6 +176,7 @@ UI Component → Custom Hook → Service Layer → Use Case → Port → Adapter
 ### Adding New Transcription Provider
 
 1. Implement `AudioTranscriptionPort`:
+
 ```typescript
 export class NewTranscriptionAdapter implements AudioTranscriptionPort {
   async transcribeAudio(audioBlob: Blob): Promise<string> {
@@ -172,6 +186,7 @@ export class NewTranscriptionAdapter implements AudioTranscriptionPort {
 ```
 
 2. Update `AudioFeedbackService` to use new adapter:
+
 ```typescript
 const transcriptionAdapter = new NewTranscriptionAdapter();
 ```

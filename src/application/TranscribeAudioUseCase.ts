@@ -1,4 +1,4 @@
-import { AudioTranscriptionPort } from '@/ports/AudioFeedbackPorts';
+import { AudioTranscriptionPort } from "@/ports/AudioFeedbackPorts";
 
 /**
  * Use case for transcribing audio
@@ -15,13 +15,15 @@ export class TranscribeAudioUseCase {
   async execute(audioBlob: Blob): Promise<string> {
     try {
       if (!audioBlob || audioBlob.size === 0) {
-        throw new Error('Audio blob is required and cannot be empty');
+        throw new Error("Audio blob is required and cannot be empty");
       }
 
-      const transcription = await this.transcriptionPort.transcribeAudio(audioBlob);
-      
+      const transcription = await this.transcriptionPort.transcribeAudio(
+        audioBlob
+      );
+
       if (!transcription || transcription.trim().length === 0) {
-        throw new Error('Transcription result is empty');
+        throw new Error("Transcription result is empty");
       }
 
       return transcription.trim();
@@ -29,7 +31,7 @@ export class TranscribeAudioUseCase {
       if (error instanceof Error) {
         throw new Error(`Audio transcription failed: ${error.message}`);
       }
-      throw new Error('Unknown error occurred during audio transcription');
+      throw new Error("Unknown error occurred during audio transcription");
     }
   }
 }

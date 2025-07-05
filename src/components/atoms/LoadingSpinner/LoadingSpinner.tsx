@@ -1,6 +1,6 @@
 export interface LoadingSpinnerProps {
-  size?: 'small' | 'medium' | 'large';
-  color?: 'primary' | 'secondary' | 'white';
+  size?: "small" | "medium" | "large";
+  color?: "primary" | "secondary" | "white";
   className?: string;
 }
 
@@ -9,20 +9,20 @@ export interface LoadingSpinnerProps {
  * Follows Single Responsibility Principle
  */
 export function LoadingSpinner({
-  size = 'medium',
-  color = 'primary',
-  className = '',
+  size = "medium",
+  color = "primary",
+  className = "",
 }: LoadingSpinnerProps) {
   const sizeClasses = {
-    small: 'w-4 h-4',
-    medium: 'w-6 h-6',
-    large: 'w-8 h-8',
+    small: "w-4 h-4",
+    medium: "w-6 h-6",
+    large: "w-8 h-8",
   };
 
   const colorClasses = {
-    primary: 'border-blue-500',
-    secondary: 'border-gray-500',
-    white: 'border-white',
+    primary: "border-blue-500",
+    secondary: "border-gray-500",
+    white: "border-white",
   };
 
   return (

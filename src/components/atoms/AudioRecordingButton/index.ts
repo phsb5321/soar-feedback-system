@@ -1,2 +1,2 @@
-export { AudioRecordingButton } from './AudioRecordingButton';
-export type { AudioRecordingButtonProps } from './AudioRecordingButton';
+export { AudioRecordingButton } from "./AudioRecordingButton";
+export type { AudioRecordingButtonProps } from "./AudioRecordingButton";

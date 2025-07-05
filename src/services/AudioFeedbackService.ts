@@ -1,9 +1,9 @@
-import { SubmitAudioFeedbackUseCase } from '@/application/SubmitAudioFeedbackUseCase';
-import { TranscribeAudioUseCase } from '@/application/TranscribeAudioUseCase';
-import { BrowserAudioRecordingAdapter } from '@/adapters/BrowserAudioRecordingAdapter';
-import { GroqTranscriptionAdapter } from '@/adapters/GroqTranscriptionAdapter';
-import { RestFeedbackSubmissionAdapter } from '@/adapters/RestFeedbackSubmissionAdapter';
-import { AudioRecordingPort } from '@/ports/AudioFeedbackPorts';
+import { BrowserAudioRecordingAdapter } from "@/adapters/BrowserAudioRecordingAdapter";
+import { GroqTranscriptionAdapter } from "@/adapters/GroqTranscriptionAdapter";
+import { RestFeedbackSubmissionAdapter } from "@/adapters/RestFeedbackSubmissionAdapter";
+import { SubmitAudioFeedbackUseCase } from "@/application/SubmitAudioFeedbackUseCase";
+import { TranscribeAudioUseCase } from "@/application/TranscribeAudioUseCase";
+import { AudioRecordingPort } from "@/ports/AudioFeedbackPorts";
 
 /**
  * Service layer for audio feedback functionality
@@ -22,7 +22,9 @@ export class AudioFeedbackService {
     this.audioRecordingAdapter = new BrowserAudioRecordingAdapter();
 
     // Initialize use cases
-    this.transcribeAudioUseCase = new TranscribeAudioUseCase(transcriptionAdapter);
+    this.transcribeAudioUseCase = new TranscribeAudioUseCase(
+      transcriptionAdapter
+    );
     this.submitAudioFeedbackUseCase = new SubmitAudioFeedbackUseCase(
       transcriptionAdapter,
       feedbackSubmissionAdapter
@@ -67,6 +69,10 @@ export class AudioFeedbackService {
     npsScore?: number,
     additionalComment?: string
   ): Promise<void> {
-    await this.submitAudioFeedbackUseCase.execute(audioBlob, npsScore, additionalComment);
+    await this.submitAudioFeedbackUseCase.execute(
+      audioBlob,
+      npsScore,
+      additionalComment
+    );
   }
 }

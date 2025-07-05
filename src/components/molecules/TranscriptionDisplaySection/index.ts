@@ -1,2 +1,2 @@
-export { TranscriptionDisplaySection } from './TranscriptionDisplaySection';
-export type { TranscriptionDisplaySectionProps } from './TranscriptionDisplaySection';
+export { TranscriptionDisplaySection } from "./TranscriptionDisplaySection";
+export type { TranscriptionDisplaySectionProps } from "./TranscriptionDisplaySection";

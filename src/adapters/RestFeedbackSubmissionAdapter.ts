@@ -1,4 +1,4 @@
-import { FeedbackSubmissionPort } from '@/ports/AudioFeedbackPorts';
+import { FeedbackSubmissionPort } from "@/ports/AudioFeedbackPorts";
 
 /**
  * Adapter for feedback submission service
@@ -7,7 +7,7 @@ import { FeedbackSubmissionPort } from '@/ports/AudioFeedbackPorts';
 export class RestFeedbackSubmissionAdapter implements FeedbackSubmissionPort {
   private readonly submitEndpoint: string;
 
-  constructor(submitEndpoint: string = '/api/feedback') {
+  constructor(submitEndpoint: string = "/api/feedback") {
     this.submitEndpoint = submitEndpoint;
   }
 
@@ -18,31 +18,30 @@ export class RestFeedbackSubmissionAdapter implements FeedbackSubmissionPort {
     additionalComment?: string;
   }): Promise<void> {
     try {
-      const formData = new FormData();
-      formData.append('audio', feedbackData.audioBlob);
-      formData.append('transcription', feedbackData.transcription);
-      
-      if (feedbackData.npsScore !== undefined) {
-        formData.append('npsScore', feedbackData.npsScore.toString());
-      }
-      
-      if (feedbackData.additionalComment !== undefined) {
-        formData.append('additionalComment', feedbackData.additionalComment);
-      }
+      const payload = {
+        transcription: feedbackData.transcription,
+        npsScore: feedbackData.npsScore,
+        additionalComment: feedbackData.additionalComment,
+      };
 
       const response = await fetch(this.submitEndpoint, {
-        method: 'POST',
-        body: formData,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        throw new Error(`Feedback submission failed: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Feedback submission failed: ${response.status} ${response.statusText}`
+        );
       }
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Feedback submission error: ${error.message}`);
       }
-      throw new Error('Unknown feedback submission error occurred');
+      throw new Error("Unknown feedback submission error occurred");
     }
   }
 }

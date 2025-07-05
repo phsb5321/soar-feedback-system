@@ -1,2 +1,2 @@
-export { FeedbackFormSection } from './FeedbackFormSection';
-export type { FeedbackFormSectionProps } from './FeedbackFormSection';
+export { FeedbackFormSection } from "./FeedbackFormSection";
+export type { FeedbackFormSectionProps } from "./FeedbackFormSection";

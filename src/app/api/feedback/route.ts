@@ -1,50 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getDb } from '../../../../drizzle/config';
+import { feedback } from '../../../../drizzle/schema';
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
-    
-    // Extract feedback data
-    const audioBlob = formData.get("audio") as Blob;
-    const transcription = formData.get("transcription") as string;
-    const npsScore = formData.get("npsScore") as string;
-    const additionalComment = formData.get("additionalComment") as string;
-    
-    // Validate required fields
-    if (!audioBlob || !transcription) {
+    const body = await req.json();
+    const { transcription, npsScore, additionalComment } = body;
+
+    if (!transcription) {
       return NextResponse.json(
-        { error: "Audio and transcription are required" },
+        { error: 'Transcription is required' },
         { status: 400 }
       );
     }
 
-    // In a real implementation, you would:
-    // 1. Save the audio file to cloud storage (AWS S3, Google Cloud Storage, etc.)
-    // 2. Store the feedback data in a database
-    // 3. Send notifications to relevant teams
-    // 4. Trigger analytics events
+    const db = await getDb();
     
-    console.log("Feedback received:", {
+    // For now, we'll store a placeholder for audio_url since we're not implementing file storage
+    // In a real application, you would upload the audio blob to cloud storage and store the URL
+    const audioUrl = `audio_${Date.now()}.webm`; // Placeholder
+    
+    const result = await db.insert(feedback).values({
+      audio_url: audioUrl,
       transcription,
-      npsScore: npsScore ? parseInt(npsScore) : null,
-      additionalComment,
-      audioSize: audioBlob.size,
-      audioType: audioBlob.type,
+      csat: npsScore,
+      additional_comment: additionalComment,
+    }).returning();
+
+    return NextResponse.json({ 
+      success: true, 
+      id: result[0].id,
+      message: 'Feedback saved successfully' 
     });
-
-    // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    return NextResponse.json({
-      success: true,
-      message: "Feedback submitted successfully",
-      timestamp: new Date().toISOString(),
-    });
-
   } catch (error) {
-    console.error("Error processing feedback:", error);
+    console.error('Feedback API error:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Failed to save feedback' },
       { status: 500 }
     );
   }
