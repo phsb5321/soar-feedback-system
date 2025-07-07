@@ -58,15 +58,57 @@ export async function getDb() {
   return db;
 }
 
-// Function to test database connectivity
-export async function testConnection() {
+// Function to test database connectivity with retry logic
+export async function testConnection(retries = 3, delay = 1000): Promise<boolean> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const client = await pool.connect();
+      await client.query("SELECT 1");
+      client.release();
+      return true;
+    } catch (error) {
+      console.error(`Database connection attempt ${attempt}/${retries} failed:`, error);
+      
+      if (attempt < retries) {
+        console.log(`Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 2; // Exponential backoff
+      }
+    }
+  }
+  return false;
+}
+
+// Function to initialize and validate database connection
+export async function initializeDatabase(): Promise<void> {
+  console.log("🔄 Initializing database connection...");
+  
+  const isConnected = await testConnection();
+  if (!isConnected) {
+    throw new Error("Failed to establish database connection after multiple attempts");
+  }
+  
+  console.log("✅ Database connection initialized successfully");
+}
+
+// Function to check if database is ready
+export async function isDatabaseReady(): Promise<boolean> {
   try {
     const client = await pool.connect();
-    await client.query("SELECT 1");
+    
+    // Check if feedback table exists
+    const tableResult = await client.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'feedback'
+      ) as exists
+    `);
+    
     client.release();
-    return true;
+    return tableResult.rows?.[0]?.exists || false;
   } catch (error) {
-    console.error("Database connection test failed:", error);
+    console.error("Database readiness check failed:", error);
     return false;
   }
 }
