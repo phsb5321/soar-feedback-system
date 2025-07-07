@@ -11,7 +11,7 @@ const connectionString = process.env.DATABASE_URL;
 
 // Parse the connection string to handle SSL settings
 const urlObj = new URL(connectionString);
-const sslMode = urlObj.searchParams.get('sslmode');
+const sslMode = urlObj.searchParams.get("sslmode");
 
 // Create pool configuration
 const poolConfig: PoolConfig = {
@@ -22,16 +22,16 @@ const poolConfig: PoolConfig = {
 };
 
 // Handle SSL configuration based on the sslmode parameter
-if (sslMode === 'require') {
+if (sslMode === "require") {
   poolConfig.ssl = {
-    rejectUnauthorized: false // Allow self-signed certificates
+    rejectUnauthorized: false, // Allow self-signed certificates
   };
-} else if (sslMode === 'disable') {
+} else if (sslMode === "disable") {
   poolConfig.ssl = false;
-} else if (sslMode === 'prefer') {
+} else if (sslMode === "prefer") {
   // Try SSL first, fallback to non-SSL if it fails
   poolConfig.ssl = {
-    rejectUnauthorized: false
+    rejectUnauthorized: false,
   };
 }
 
@@ -39,12 +39,14 @@ if (sslMode === 'require') {
 const pool = new Pool(poolConfig);
 
 // Add error handling for SSL connection issues
-pool.on('error', (err) => {
-  console.error('Database pool error:', err);
-  
+pool.on("error", (err) => {
+  console.error("Database pool error:", err);
+
   // If it's an SSL error, provide helpful guidance
-  if (err.message.includes('SSL') || err.message.includes('ssl')) {
-    console.error('SSL connection failed. Consider using sslmode=disable or sslmode=prefer in your DATABASE_URL');
+  if (err.message.includes("SSL") || err.message.includes("ssl")) {
+    console.error(
+      "SSL connection failed. Consider using sslmode=disable or sslmode=prefer in your DATABASE_URL"
+    );
   }
 });
 
