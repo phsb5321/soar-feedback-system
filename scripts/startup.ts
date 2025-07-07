@@ -23,7 +23,7 @@ async function main() {
     // Step 1: Test database connection
     console.log("🔍 Testing database connection...");
     const isConnected = await testConnection();
-    
+
     if (!isConnected) {
       console.error("❌ Database connection failed!");
       hasErrors = true;
@@ -34,23 +34,26 @@ async function main() {
     // Step 2: Check database version and basic info
     console.log("📋 Getting database information...");
     const versionResult = await db.execute(sql`SELECT version()`);
-    const version = versionResult.rows?.[0]?.version?.toString().split(" ")[0] || "unknown";
+    const version =
+      versionResult.rows?.[0]?.version?.toString().split(" ")[0] || "unknown";
     console.log(`   Database: ${version}`);
 
     // Step 3: Check if tables exist
     console.log("🔍 Checking table existence...");
     const tableExists = await checkTableExists();
-    
+
     if (!tableExists) {
       console.log("⚠️  Feedback table doesn't exist, running migrations...");
       await runMigrations();
     } else {
       console.log("✅ Feedback table exists");
-      
+
       // Check if table structure is correct
       const isStructureValid = await validateTableStructure();
       if (!isStructureValid) {
-        console.log("⚠️  Table structure needs updating, running migrations...");
+        console.log(
+          "⚠️  Table structure needs updating, running migrations..."
+        );
         await runMigrations();
       } else {
         console.log("✅ Table structure is valid");
@@ -68,7 +71,6 @@ async function main() {
       console.error("❌ Deployment validation failed!");
       process.exit(1);
     }
-
   } catch (error) {
     console.error("💥 Deployment validation failed with error:", error);
     process.exit(1);
@@ -105,33 +107,44 @@ async function validateTableStructure(): Promise<boolean> {
     `);
 
     const requiredColumns = [
-      { name: 'id', type: 'integer', nullable: 'NO' },
-      { name: 'audio_url', type: 'text', nullable: 'NO' },
-      { name: 'transcription', type: 'text', nullable: 'NO' },
-      { name: 'csat', type: 'integer', nullable: 'YES' },
-      { name: 'additional_comment', type: 'text', nullable: 'YES' },
-      { name: 'created_at', type: 'timestamp without time zone', nullable: 'NO' }
+      { name: "id", type: "integer", nullable: "NO" },
+      { name: "audio_url", type: "text", nullable: "NO" },
+      { name: "transcription", type: "text", nullable: "NO" },
+      { name: "csat", type: "integer", nullable: "YES" },
+      { name: "additional_comment", type: "text", nullable: "YES" },
+      {
+        name: "created_at",
+        type: "timestamp without time zone",
+        nullable: "NO",
+      },
     ];
 
-    const existingColumns = columns.rows?.map(row => ({
-      name: row.column_name,
-      type: row.data_type,
-      nullable: row.is_nullable
-    })) || [];
+    const existingColumns =
+      columns.rows?.map((row) => ({
+        name: row.column_name,
+        type: row.data_type,
+        nullable: row.is_nullable,
+      })) || [];
 
     for (const requiredCol of requiredColumns) {
-      const existingCol = existingColumns.find(col => col.name === requiredCol.name);
+      const existingCol = existingColumns.find(
+        (col) => col.name === requiredCol.name
+      );
       if (!existingCol) {
         console.log(`   Missing column: ${requiredCol.name}`);
         return false;
       }
       if (existingCol.type !== requiredCol.type) {
-        console.log(`   Column type mismatch: ${requiredCol.name} (expected: ${requiredCol.type}, got: ${existingCol.type})`);
+        console.log(
+          `   Column type mismatch: ${requiredCol.name} (expected: ${requiredCol.type}, got: ${existingCol.type})`
+        );
         return false;
       }
     }
 
-    console.log(`   All ${requiredColumns.length} columns are present and valid`);
+    console.log(
+      `   All ${requiredColumns.length} columns are present and valid`
+    );
     return true;
   } catch (error) {
     console.error("Error validating table structure:", error);
@@ -142,7 +155,7 @@ async function validateTableStructure(): Promise<boolean> {
 async function runMigrations(): Promise<void> {
   try {
     console.log("🔄 Running database migrations...");
-    
+
     // Create the feedback table with proper structure
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS feedback (
@@ -175,7 +188,7 @@ async function performHealthCheck(): Promise<void> {
   try {
     // Test basic CRUD operations
     console.log("   Testing basic database operations...");
-    
+
     // Test SELECT
     const testSelect = await db.execute(sql`SELECT 1 as test`);
     if (testSelect.rows?.[0]?.test !== 1) {
@@ -183,7 +196,9 @@ async function performHealthCheck(): Promise<void> {
     }
 
     // Test feedback table access
-    const count = await db.select({ count: sql<number>`count(*)::int` }).from(feedback);
+    const count = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(feedback);
     console.log(`   Current feedback records: ${count[0]?.count || 0}`);
 
     // Test INSERT/DELETE (with rollback)
@@ -193,9 +208,9 @@ async function performHealthCheck(): Promise<void> {
         audio_url: "health_check_test.webm",
         transcription: "Health check test record",
         csat: 10,
-        additional_comment: "This is a test record for health check"
+        additional_comment: "This is a test record for health check",
       });
-      
+
       await db.execute(sql`ROLLBACK`);
       console.log("   Database operations test passed");
     } catch (error) {
@@ -211,14 +226,14 @@ async function performHealthCheck(): Promise<void> {
 }
 
 // Handle graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('🔄 Received SIGTERM, closing database connections...');
+process.on("SIGTERM", async () => {
+  console.log("🔄 Received SIGTERM, closing database connections...");
   await closeConnections();
   process.exit(0);
 });
 
-process.on('SIGINT', async () => {
-  console.log('🔄 Received SIGINT, closing database connections...');
+process.on("SIGINT", async () => {
+  console.log("🔄 Received SIGINT, closing database connections...");
   await closeConnections();
   process.exit(0);
 });
