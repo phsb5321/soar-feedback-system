@@ -59,7 +59,10 @@ export async function getDb() {
 }
 
 // Function to test database connectivity with retry logic
-export async function testConnection(retries = 3, delay = 1000): Promise<boolean> {
+export async function testConnection(
+  retries = 3,
+  delay = 1000
+): Promise<boolean> {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const client = await pool.connect();
@@ -67,11 +70,14 @@ export async function testConnection(retries = 3, delay = 1000): Promise<boolean
       client.release();
       return true;
     } catch (error) {
-      console.error(`Database connection attempt ${attempt}/${retries} failed:`, error);
-      
+      console.error(
+        `Database connection attempt ${attempt}/${retries} failed:`,
+        error
+      );
+
       if (attempt < retries) {
         console.log(`Retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         delay *= 2; // Exponential backoff
       }
     }
@@ -82,12 +88,14 @@ export async function testConnection(retries = 3, delay = 1000): Promise<boolean
 // Function to initialize and validate database connection
 export async function initializeDatabase(): Promise<void> {
   console.log("🔄 Initializing database connection...");
-  
+
   const isConnected = await testConnection();
   if (!isConnected) {
-    throw new Error("Failed to establish database connection after multiple attempts");
+    throw new Error(
+      "Failed to establish database connection after multiple attempts"
+    );
   }
-  
+
   console.log("✅ Database connection initialized successfully");
 }
 
@@ -95,7 +103,7 @@ export async function initializeDatabase(): Promise<void> {
 export async function isDatabaseReady(): Promise<boolean> {
   try {
     const client = await pool.connect();
-    
+
     // Check if feedback table exists
     const tableResult = await client.query(`
       SELECT EXISTS (
@@ -104,7 +112,7 @@ export async function isDatabaseReady(): Promise<boolean> {
         AND table_name = 'feedback'
       ) as exists
     `);
-    
+
     client.release();
     return tableResult.rows?.[0]?.exists || false;
   } catch (error) {
