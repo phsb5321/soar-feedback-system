@@ -2,12 +2,34 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as schema from "./schema";
 
-// Validate that DATABASE_URL is set
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is required");
+// Function to construct DATABASE_URL from individual components if not provided
+function getDatabaseUrl(): string {
+  // If DATABASE_URL is provided, use it directly
+  if (process.env.DATABASE_URL) {
+    return process.env.DATABASE_URL;
+  }
+
+  // Otherwise, construct it from individual environment variables
+  const {
+    POSTGRES_USER = "postgres",
+    POSTGRES_PASSWORD = "postgres",
+    POSTGRES_HOST = "localhost",
+    POSTGRES_PORT = "5432",
+    POSTGRES_DB = "soar_feedback",
+  } = process.env;
+
+  return `postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}`;
 }
 
-const connectionString = process.env.DATABASE_URL;
+// Get the connection string
+const connectionString = getDatabaseUrl();
+
+// Validate that we have a valid connection string
+if (!connectionString) {
+  throw new Error(
+    "DATABASE_URL or PostgreSQL environment variables are required"
+  );
+}
 
 // Create a connection pool for better performance
 const pool = new Pool({
