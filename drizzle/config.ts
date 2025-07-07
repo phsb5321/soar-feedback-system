@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import { Pool, PoolConfig } from "pg";
 import * as schema from "./schema";
 
 // Validate that DATABASE_URL is set
@@ -9,12 +9,43 @@ if (!process.env.DATABASE_URL) {
 
 const connectionString = process.env.DATABASE_URL;
 
-// Create a connection pool for better performance
-const pool = new Pool({
+// Parse the connection string to handle SSL settings
+const urlObj = new URL(connectionString);
+const sslMode = urlObj.searchParams.get('sslmode');
+
+// Create pool configuration
+const poolConfig: PoolConfig = {
   connectionString,
   max: 10, // Maximum number of connections
   idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
   connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
+};
+
+// Handle SSL configuration based on the sslmode parameter
+if (sslMode === 'require') {
+  poolConfig.ssl = {
+    rejectUnauthorized: false // Allow self-signed certificates
+  };
+} else if (sslMode === 'disable') {
+  poolConfig.ssl = false;
+} else if (sslMode === 'prefer') {
+  // Try SSL first, fallback to non-SSL if it fails
+  poolConfig.ssl = {
+    rejectUnauthorized: false
+  };
+}
+
+// Create a connection pool for better performance
+const pool = new Pool(poolConfig);
+
+// Add error handling for SSL connection issues
+pool.on('error', (err) => {
+  console.error('Database pool error:', err);
+  
+  // If it's an SSL error, provide helpful guidance
+  if (err.message.includes('SSL') || err.message.includes('ssl')) {
+    console.error('SSL connection failed. Consider using sslmode=disable or sslmode=prefer in your DATABASE_URL');
+  }
 });
 
 // Database instance with connection pool
