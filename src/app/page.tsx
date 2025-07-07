@@ -26,7 +26,7 @@ export default function Home() {
       >
         <div className="text-center mb-6 sm:mb-8 md:mb-10">
           <h1
-            className="mb-2 sm:mb-3 text-3xl sm:text-4xl md:text-5xl font-bold drop-shadow-lg tracking-widest"
+            className="mb-2 sm:mb-3 text-3xl sm:text-4xl md:text-5xl font-bold drop-shadow-lg tracking-widest font-pacifico"
             style={{
               background:
                 "linear-gradient(to right, #3b82f6, #8b5cf6, #ec4899)",
