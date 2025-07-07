@@ -13,6 +13,7 @@ export class BrowserAudioRecordingAdapter implements AudioRecordingPort {
         audio: true,
       });
       const mediaRecorder = new MediaRecorder(this.mediaStream);
+      mediaRecorder.start();
       return mediaRecorder;
     } catch (error) {
       if (error instanceof Error) {
@@ -61,6 +62,11 @@ export class BrowserAudioRecordingAdapter implements AudioRecordingPort {
       };
 
       try {
+        // Check if recorder is in a state where it can be stopped
+        if (recorder.state === "inactive") {
+          reject(new Error("Recording is not active"));
+          return;
+        }
         recorder.stop();
       } catch (error) {
         reject(

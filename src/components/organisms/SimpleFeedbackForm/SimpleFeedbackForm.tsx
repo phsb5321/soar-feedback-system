@@ -5,12 +5,11 @@ import { Icon } from "@/components/atoms/Icon/Icon";
 import { Text } from "@/components/atoms/Text/Text";
 import {
   AudioRecordingSection,
-  FeedbackFormSection,
   TranscriptionDisplaySection,
 } from "@/components/molecules";
 import { useAudioFeedback } from "@/hooks/useAudioFeedback";
 import { Paper } from "@mui/material";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export interface SimpleFeedbackFormProps {
   className?: string;
@@ -23,31 +22,32 @@ export interface SimpleFeedbackFormProps {
 export function SimpleFeedbackForm({
   className = "",
 }: SimpleFeedbackFormProps) {
-  const [npsScore, setNpsScore] = useState<number | null>(null);
-  const [additionalComment, setAdditionalComment] = useState("");
+  const router = useRouter();
 
   const {
     isRecording,
     audioBlob,
     transcription,
     isTranscribing,
-    isSubmitting,
     error,
     isSuccess,
     startRecording,
     stopRecording,
-    submitFeedback,
     resetForm,
   } = useAudioFeedback();
 
-  const handleSubmit = async () => {
-    await submitFeedback(npsScore || undefined, additionalComment || undefined);
+  const handleProceedToCSAT = () => {
+    if (transcription) {
+      const params = new URLSearchParams({
+        transcription,
+        audioUrl: audioBlob ? "recorded" : "",
+      });
+      router.push(`/csat?${params.toString()}`);
+    }
   };
 
-  const handleReset = () => {
+  const handleReRecord = () => {
     resetForm();
-    setNpsScore(null);
-    setAdditionalComment("");
   };
 
   if (isSuccess) {
@@ -78,14 +78,18 @@ export function SimpleFeedbackForm({
               className="text-green-600"
             />
           </div>
-          <Text variant="h3" className="text-green-600 font-bold">
+          <Text variant="h3" className="font-bold" style={{ color: "#16a34a" }}>
             Feedback Enviado com Sucesso!
           </Text>
-          <Text variant="body" className="text-gray-600 max-w-md">
+          <Text
+            variant="body"
+            className="max-w-md"
+            style={{ color: "#6b7280" }}
+          >
             Obrigado por sua participação. Sua opinião é muito importante para
             nós.
           </Text>
-          <Button variant="primary" onClick={handleReset} className="mt-8">
+          <Button variant="primary" onClick={handleReRecord} className="mt-8">
             Enviar Novo Feedback
           </Button>
         </div>
@@ -123,10 +127,14 @@ export function SimpleFeedbackForm({
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center">
-            <Text variant="h3" className="font-bold text-gray-800 mb-2">
+            <Text
+              variant="h3"
+              className="font-bold mb-2"
+              style={{ color: "#1f2937" }}
+            >
               Sistema de Avaliação SOAR
             </Text>
-            <Text variant="body" className="text-gray-600">
+            <Text variant="body" style={{ color: "#6b7280" }}>
               Compartilhe sua experiência conosco
             </Text>
           </div>
@@ -141,20 +149,65 @@ export function SimpleFeedbackForm({
 
           {/* Transcription Display Section - Show after recording stops */}
           {!isRecording && transcription && (
-            <TranscriptionDisplaySection transcription={transcription} />
-          )}
+            <>
+              <TranscriptionDisplaySection transcription={transcription} />
 
-          {/* Feedback Form Section - Show CSAT only after recording stops and transcription is available */}
-          {!isRecording && audioBlob && transcription && !isTranscribing && (
-            <FeedbackFormSection
-              npsScore={npsScore}
-              additionalComment={additionalComment}
-              onNpsScoreChange={setNpsScore}
-              onAdditionalCommentChange={setAdditionalComment}
-              onSubmit={handleSubmit}
-              isSubmitting={isSubmitting}
-              isDisabled={!audioBlob || !transcription}
-            />
+              {/* Action buttons for transcription review */}
+              <div className="space-y-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-5 h-5 text-blue-600 mt-0.5">
+                      <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <Text
+                        variant="body"
+                        className="font-medium"
+                        style={{ color: "#1f2937" }}
+                      >
+                        Revise sua transcrição
+                      </Text>
+                      <Text variant="caption" style={{ color: "#6b7280" }}>
+                        Verifique se a transcrição está correta. Você pode
+                        regravar se necessário ou prosseguir para a avaliação.
+                      </Text>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    variant="secondary"
+                    onClick={handleReRecord}
+                    className="w-full sm:w-auto"
+                    style={{ color: "#6b7280", borderColor: "#d1d5db" }}
+                  >
+                    <div className="flex items-center justify-center space-x-2">
+                      <Icon src="/mic.svg" alt="Regravar" size={20} />
+                      <span>Regravar</span>
+                    </div>
+                  </Button>
+
+                  <Button
+                    variant="primary"
+                    onClick={handleProceedToCSAT}
+                    disabled={!transcription || isTranscribing}
+                    className="w-full sm:flex-1"
+                  >
+                    <div className="flex items-center justify-center space-x-2">
+                      <Icon src="/arrow-right.svg" alt="Continuar" size={20} />
+                      <span>Continuar para Avaliação</span>
+                    </div>
+                  </Button>
+                </div>
+              </div>
+            </>
           )}
 
           {/* Error Display */}

@@ -25,13 +25,24 @@ export default function Home() {
         className="relative z-10"
       >
         <div className="text-center mb-6 sm:mb-8 md:mb-10">
-          <h1 className="mb-2 sm:mb-3 text-3xl sm:text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 drop-shadow-lg tracking-widest">
+          <h1
+            className="mb-2 sm:mb-3 text-3xl sm:text-4xl md:text-5xl font-bold drop-shadow-lg tracking-widest"
+            style={{
+              background:
+                "linear-gradient(to right, #3b82f6, #8b5cf6, #ec4899)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              color: "#1f2937", // Fallback color
+            }}
+          >
             SOAR
           </h1>
           <Text
             variant="body"
             color="secondary"
             className="text-lg sm:text-xl font-medium tracking-wide opacity-80"
+            style={{ color: "#6b7280" }}
           >
             Sistema de Avaliação e Feedback
           </Text>

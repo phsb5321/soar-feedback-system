@@ -1,5 +1,4 @@
-import { getDb } from './config';
-import { feedback } from './schema';
+import { getDb } from "./config";
 
 async function migrate() {
   const db = await getDb();
@@ -16,7 +15,7 @@ async function migrate() {
       created_at TIMESTAMP DEFAULT NOW() NOT NULL
     );
   `);
-  console.log('Migration complete.');
+  console.log("Migration complete.");
   process.exit(0);
 }
 

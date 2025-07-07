@@ -29,7 +29,7 @@ export function Text({
 
   const colorClasses = {
     primary: "text-gray-900 dark:text-gray-100",
-    secondary: "text-gray-600 dark:text-gray-400",
+    secondary: "text-gray-700 dark:text-gray-300",
     error: "text-red-600 dark:text-red-400",
     success: "text-green-600 dark:text-green-400",
   };
