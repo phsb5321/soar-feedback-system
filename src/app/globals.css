@@ -8,13 +8,9 @@
   --accent-blue: #3b82f6;
   --accent-purple: #8b5cf6;
   --accent-pink: #ec4899;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --text-on-white: #1f2937;
+  --text-secondary-on-white: #6b7280;
+  --text-muted-on-white: #9ca3af;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,6 +19,10 @@
     --foreground: #ededed;
     --primary: #f9fafb;
     --secondary: #9ca3af;
+    /* Even in dark mode, text on white backgrounds should be dark */
+    --text-on-white: #1f2937;
+    --text-secondary-on-white: #6b7280;
+    --text-muted-on-white: #9ca3af;
   }
 }
 
@@ -35,6 +35,23 @@ body {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* Ensure text is visible during hydration */
+  min-height: 100vh;
+}
+
+/* Ensure no flash of invisible text during hydration */
+.text-transparent {
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+/* Fallback for browsers that don't support background-clip: text */
+@supports not (background-clip: text) {
+  .text-transparent {
+    color: #1f2937 !important;
+    -webkit-text-fill-color: unset !important;
+  }
 }
 
 /* Custom font utilities */
@@ -171,4 +188,319 @@ button, .group {
     padding-left: max(0px, env(safe-area-inset-left));
     padding-right: max(0px, env(safe-area-inset-right));
   }
+}
+
+/* === GLOBAL TEXT VISIBILITY FIXES === */
+/* Force proper text colors on white backgrounds, especially MUI Paper components */
+
+/* Target MUI Paper components specifically */
+.MuiPaper-root {
+  /* Force all text elements to have proper contrast against white background */
+  color: var(--primary) !important;
+}
+
+.MuiPaper-root * {
+  /* Ensure all child elements inherit proper text color */
+  color: inherit;
+}
+
+/* Override Tailwind's gray text classes with proper contrast colors */
+.MuiPaper-root .text-gray-900 {
+  color: #1f2937 !important; /* gray-800 for better contrast */
+}
+
+.MuiPaper-root .text-gray-800 {
+  color: #1f2937 !important; /* gray-800 */
+}
+
+.MuiPaper-root .text-gray-700 {
+  color: #374151 !important; /* gray-700 */
+}
+
+.MuiPaper-root .text-gray-600 {
+  color: #4b5563 !important; /* gray-600 */
+}
+
+.MuiPaper-root .text-gray-500 {
+  color: #6b7280 !important; /* gray-500 */
+}
+
+.MuiPaper-root .text-gray-400 {
+  color: #9ca3af !important; /* gray-400 */
+}
+
+/* Force specific text color utilities to work properly */
+.MuiPaper-root .text-primary {
+  color: var(--primary) !important;
+}
+
+.MuiPaper-root .text-secondary {
+  color: var(--secondary) !important;
+}
+
+/* Override Text component color classes within Paper */
+.MuiPaper-root h1,
+.MuiPaper-root h2,
+.MuiPaper-root h3,
+.MuiPaper-root h4,
+.MuiPaper-root h5,
+.MuiPaper-root h6 {
+  color: var(--primary) !important;
+}
+
+.MuiPaper-root p,
+.MuiPaper-root span,
+.MuiPaper-root div {
+  color: var(--primary) !important;
+}
+
+/* Special handling for caption text */
+.MuiPaper-root .text-xs,
+.MuiPaper-root .text-sm,
+.MuiPaper-root [class*="caption"] {
+  color: var(--secondary) !important;
+}
+
+/* Ensure buttons maintain their text colors */
+.MuiPaper-root button {
+  color: inherit !important;
+}
+
+/* Handle specific color variants */
+.MuiPaper-root .text-blue-600,
+.MuiPaper-root .text-blue-500 {
+  color: var(--accent-blue) !important;
+}
+
+.MuiPaper-root .text-green-600,
+.MuiPaper-root .text-green-500 {
+  color: #16a34a !important;
+}
+
+.MuiPaper-root .text-red-600,
+.MuiPaper-root .text-red-500 {
+  color: #dc2626 !important;
+}
+
+/* Global fallback for any white background containers */
+[style*="background: rgba(255, 255, 255"],
+[style*="background: rgb(255, 255, 255"],
+[style*="background-color: white"],
+[style*="background-color: #fff"],
+[style*="background-color: #ffffff"] {
+  color: var(--primary) !important;
+}
+
+/* Additional specific targeting for common white background patterns */
+.bg-white,
+.bg-gray-50,
+.bg-gray-100 {
+  color: var(--primary) !important;
+}
+
+/* Ensure Text component works properly regardless of background */
+.text-gray-900,
+.text-gray-800,
+.text-gray-700,
+.text-gray-600,
+.text-gray-500 {
+  color: var(--primary) !important;
+}
+
+/* Override dark mode text colors when on white backgrounds */
+@media (prefers-color-scheme: dark) {
+  .MuiPaper-root,
+  .MuiPaper-root *,
+  [style*="background: rgba(255, 255, 255"] *,
+  [style*="background: rgb(255, 255, 255"] *,
+  .bg-white *,
+  .bg-gray-50 *,
+  .bg-gray-100 * {
+    color: var(--primary) !important;
+  }
+}
+
+/* Ensure proper text color for all form elements */
+.MuiPaper-root input,
+.MuiPaper-root textarea,
+.MuiPaper-root select {
+  color: var(--primary) !important;
+}
+
+/* Text component specific overrides */
+.MuiPaper-root [class*="text-"],
+.bg-white [class*="text-"],
+.bg-gray-50 [class*="text-"],
+.bg-gray-100 [class*="text-"] {
+  color: var(--primary) !important;
+}
+
+/* Special case for maintaining accent colors */
+.MuiPaper-root .text-blue-600,
+.MuiPaper-root .text-blue-500,
+.MuiPaper-root .text-blue-400 {
+  color: var(--accent-blue) !important;
+}
+
+.MuiPaper-root .text-purple-600,
+.MuiPaper-root .text-purple-500 {
+  color: var(--accent-purple) !important;
+}
+
+.MuiPaper-root .text-pink-600,
+.MuiPaper-root .text-pink-500 {
+  color: var(--accent-pink) !important;
+}
+
+/* === COMPREHENSIVE TEXT VISIBILITY ENFORCEMENT === */
+/* Additional safety net for any missed text elements */
+
+/* Force all text elements in white/light backgrounds to be visible */
+.MuiPaper-root > *,
+.MuiPaper-root p,
+.MuiPaper-root span,
+.MuiPaper-root div,
+.MuiPaper-root h1,
+.MuiPaper-root h2,
+.MuiPaper-root h3,
+.MuiPaper-root h4,
+.MuiPaper-root h5,
+.MuiPaper-root h6,
+.MuiPaper-root label,
+.MuiPaper-root li,
+.MuiPaper-root td,
+.MuiPaper-root th,
+.MuiPaper-root caption,
+.MuiPaper-root figcaption {
+  color: var(--text-on-white) !important;
+}
+
+/* Ensure proper inheritance for nested elements */
+.MuiPaper-root *:not(button):not(input):not(select):not(textarea) {
+  color: inherit !important;
+}
+
+/* Additional targeting for common utility classes */
+.MuiPaper-root .font-semibold,
+.MuiPaper-root .font-bold,
+.MuiPaper-root .font-medium {
+  color: var(--text-on-white) !important;
+}
+
+/* Ensure opacity classes still work but with proper base color */
+.MuiPaper-root .opacity-80,
+.MuiPaper-root .opacity-60,
+.MuiPaper-root .opacity-40 {
+  color: var(--text-on-white) !important;
+}
+
+/* Target specific component patterns */
+.MuiPaper-root [class*="text-center"],
+.MuiPaper-root [class*="text-left"],
+.MuiPaper-root [class*="text-right"] {
+  color: var(--text-on-white) !important;
+}
+
+/* For any remaining Tailwind text size classes */
+.MuiPaper-root .text-xs,
+.MuiPaper-root .text-sm,
+.MuiPaper-root .text-base,
+.MuiPaper-root .text-lg,
+.MuiPaper-root .text-xl,
+.MuiPaper-root .text-2xl,
+.MuiPaper-root .text-3xl,
+.MuiPaper-root .text-4xl,
+.MuiPaper-root .text-5xl {
+  color: var(--text-on-white) !important;
+}
+
+/* Force proper contrast for any potential invisible text */
+.MuiPaper-root [style*="color: white"],
+.MuiPaper-root [style*="color: #fff"],
+.MuiPaper-root [style*="color: #ffffff"],
+.MuiPaper-root [style*="color: rgb(255, 255, 255)"],
+.MuiPaper-root [style*="color: rgba(255, 255, 255"] {
+  color: var(--text-on-white) !important;
+}
+
+/* Ensure Material-UI components have proper text color */
+.MuiPaper-root .MuiTypography-root {
+  color: var(--text-on-white) !important;
+}
+
+/* Last resort - force any text that might be invisible */
+.MuiPaper-root *[class*="text-"] {
+  color: var(--text-on-white) !important;
+}
+
+/* === RATING COMPONENT SPECIFIC FIXES === */
+/* Ensure MUI Rating component is always visible */
+.MuiPaper-root .MuiRating-root {
+  color: var(--text-on-white) !important;
+}
+
+.MuiPaper-root .MuiRating-iconEmpty {
+  color: #d1d5db !important;
+}
+
+.MuiPaper-root .MuiRating-iconFilled {
+  color: #3b82f6 !important; /* Default blue color */
+}
+
+.MuiPaper-root .MuiRating-iconHover {
+  color: #1d4ed8 !important; /* Darker blue on hover */
+}
+
+/* Ensure Chip components are visible */
+.MuiPaper-root .MuiChip-root {
+  color: #ffffff !important;
+  background-color: #3b82f6 !important;
+}
+
+.MuiPaper-root .MuiChip-root .MuiChip-label {
+  color: inherit !important;
+}
+
+/* Ensure TextField components have proper text color */
+.MuiPaper-root .MuiTextField-root input,
+.MuiPaper-root .MuiTextField-root textarea {
+  color: var(--text-on-white) !important;
+}
+
+.MuiPaper-root .MuiTextField-root label {
+  color: var(--secondary) !important;
+}
+
+.MuiPaper-root .MuiTextField-root .MuiInputBase-root {
+  color: var(--text-on-white) !important;
+}
+
+/* Additional safety for form elements */
+.MuiPaper-root .MuiFormLabel-root {
+  color: var(--secondary) !important;
+}
+
+/* Ensure all text elements are visible regardless of nesting */
+.MuiPaper-root *:not(svg):not(path):not(button) {
+  color: var(--text-on-white) !important;
+}
+
+/* Override for specific accent colors */
+.MuiPaper-root .text-blue-600,
+.MuiPaper-root .text-blue-500,
+.MuiPaper-root .text-green-600,
+.MuiPaper-root .text-green-500,
+.MuiPaper-root .text-red-600,
+.MuiPaper-root .text-red-500 {
+  color: var(--accent-blue) !important;
+}
+
+.MuiPaper-root .text-green-600,
+.MuiPaper-root .text-green-500 {
+  color: #16a34a !important;
+}
+
+.MuiPaper-root .text-red-600,
+.MuiPaper-root .text-red-500 {
+  color: #dc2626 !important;
 }
