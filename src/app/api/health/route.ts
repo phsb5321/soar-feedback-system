@@ -2,10 +2,14 @@ import { sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { db, testConnection } from "../../../../drizzle/config";
 import { feedback } from "../../../../drizzle/schema";
+import { ensureDbReady } from "../../../lib/db-init";
 
 export async function GET() {
   try {
     const startTime = Date.now();
+
+    // Ensure database is initialized and ready
+    await ensureDbReady();
 
     // Test basic connectivity
     const isConnected = await testConnection();
