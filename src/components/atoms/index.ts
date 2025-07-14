@@ -18,3 +18,6 @@ export type { LoadingSpinnerProps } from "@/components/atoms/LoadingSpinner/Load
 
 export { ErrorMessage } from "@/components/atoms/ErrorMessage/ErrorMessage";
 export type { ErrorMessageProps } from "@/components/atoms/ErrorMessage/ErrorMessage";
+
+export { Logo } from "@/components/atoms/Logo/Logo";
+export type { LogoProps } from "@/components/atoms/Logo/Logo";
