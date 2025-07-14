@@ -25,6 +25,8 @@ const poolConfig: PoolConfig = {
 if (sslMode === "require") {
   poolConfig.ssl = {
     rejectUnauthorized: false, // Allow self-signed certificates
+    checkServerIdentity: () => undefined, // Skip server identity verification
+    secureProtocol: 'TLSv1_2_method', // Use specific TLS version
   };
 } else if (sslMode === "disable") {
   poolConfig.ssl = false;
@@ -32,6 +34,14 @@ if (sslMode === "require") {
   // Try SSL first, fallback to non-SSL if it fails
   poolConfig.ssl = {
     rejectUnauthorized: false,
+    checkServerIdentity: () => undefined,
+    secureProtocol: 'TLSv1_2_method',
+  };
+} else if (sslMode === "allow") {
+  // Allow SSL but don't require it
+  poolConfig.ssl = {
+    rejectUnauthorized: false,
+    checkServerIdentity: () => undefined,
   };
 }
 
@@ -39,14 +49,18 @@ if (sslMode === "require") {
 const pool = new Pool(poolConfig);
 
 // Add error handling for SSL connection issues
-pool.on("error", (err) => {
+pool.on("error", (err: Error & { code?: string }) => {
   console.error("Database pool error:", err);
 
   // If it's an SSL error, provide helpful guidance
-  if (err.message.includes("SSL") || err.message.includes("ssl")) {
+  if (err.message.includes("SSL") || err.message.includes("ssl") || 
+      err.code === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' ||
+      err.message.includes("certificate")) {
     console.error(
       "SSL connection failed. Consider using sslmode=disable or sslmode=prefer in your DATABASE_URL"
     );
+    console.error("Current SSL mode:", sslMode);
+    console.error("SSL configuration applied:", poolConfig.ssl);
   }
 });
 
@@ -69,11 +83,26 @@ export async function testConnection(
       await client.query("SELECT 1");
       client.release();
       return true;
-    } catch (error) {
+    } catch (error: unknown) {
+      const err = error as Error & { code?: string };
       console.error(
         `Database connection attempt ${attempt}/${retries} failed:`,
         error
       );
+
+      // Handle specific SSL certificate errors
+      if (err.code === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' || 
+          err.message?.includes('certificate') ||
+          err.message?.includes('SSL')) {
+        console.error("SSL certificate error detected. Suggesting alternative connection methods.");
+        
+        // If this is an SSL error and we're on the last attempt, 
+        // provide guidance for the user
+        if (attempt === retries) {
+          console.error("\n🔧 SOLUTION: Update your DATABASE_URL to use sslmode=disable:");
+          console.error(`${connectionString.replace('sslmode=require', 'sslmode=disable')}`);
+        }
+      }
 
       if (attempt < retries) {
         console.log(`Retrying in ${delay}ms...`);
