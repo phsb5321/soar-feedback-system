@@ -1,6 +1,6 @@
 /**
  * Migration Port Interface
- * 
+ *
  * Defines the contract for database migration operations
  * following hexagonal architecture principles.
  */

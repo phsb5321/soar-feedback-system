@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   try {
     // Ensure database is initialized and ready
     await ensureDbReady();
-    
+
     // Test database connection first
     const isConnected = await testConnection();
     if (!isConnected) {
@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
   try {
     // Ensure database is initialized and ready
     await ensureDbReady();
-    
+
     const isConnected = await testConnection();
     if (!isConnected) {
       return NextResponse.json(

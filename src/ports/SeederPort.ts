@@ -1,6 +1,6 @@
 /**
  * Database Seeder Port Interface
- * 
+ *
  * Defines the contract for database seeding operations
  * following hexagonal architecture principles.
  */

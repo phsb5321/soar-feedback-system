@@ -42,7 +42,7 @@ async function performInitialization(): Promise<void> {
 
     // Check if feedback table exists
     const tableExists = await checkTableExists();
-    
+
     if (!tableExists) {
       console.log("⚠️  Feedback table doesn't exist, creating it...");
       await runMigrations();
@@ -53,7 +53,7 @@ async function performInitialization(): Promise<void> {
   } catch (error) {
     console.error("❌ Database initialization failed:", error);
     // Don't throw in production - let the app continue and handle DB errors gracefully
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       throw error;
     }
   }
@@ -65,19 +65,25 @@ async function checkTableExists(): Promise<boolean> {
     await db.execute(sql`
       SELECT 1 FROM feedback LIMIT 1;
     `);
-    
+
     console.log("✅ Feedback table exists and is accessible");
     return true;
   } catch (error: unknown) {
     // Check if the error is specifically about the table not existing
     const dbError = error as { code?: string; message?: string };
-    if (dbError?.code === '42P01' || dbError?.message?.includes('does not exist')) {
+    if (
+      dbError?.code === "42P01" ||
+      dbError?.message?.includes("does not exist")
+    ) {
       console.log("⚠️  Feedback table does not exist");
       return false;
     }
-    
+
     // For other errors, log them but assume table exists to avoid unnecessary recreation
-    console.warn("Warning checking table existence:", dbError.message || String(error));
+    console.warn(
+      "Warning checking table existence:",
+      dbError.message || String(error)
+    );
     return true;
   }
 }

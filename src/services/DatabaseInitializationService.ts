@@ -5,7 +5,7 @@ import { SeederPort } from "@/ports/SeederPort";
 
 /**
  * Database Initialization Service
- * 
+ *
  * Orchestrates database migrations and seeding using ports and adapters
  * following hexagonal architecture principles.
  */
@@ -15,10 +15,7 @@ export class DatabaseInitializationService {
   private static instance: DatabaseInitializationService | null = null;
   private initialized = false;
 
-  constructor(
-    migrationAdapter?: MigrationPort,
-    seederAdapter?: SeederPort
-  ) {
+  constructor(migrationAdapter?: MigrationPort, seederAdapter?: SeederPort) {
     this.migrationAdapter = migrationAdapter || new DrizzleMigrationAdapter();
     this.seederAdapter = seederAdapter || new DrizzleSeederAdapter();
   }
@@ -28,7 +25,8 @@ export class DatabaseInitializationService {
    */
   static getInstance(): DatabaseInitializationService {
     if (!DatabaseInitializationService.instance) {
-      DatabaseInitializationService.instance = new DatabaseInitializationService();
+      DatabaseInitializationService.instance =
+        new DatabaseInitializationService();
     }
     return DatabaseInitializationService.instance;
   }
@@ -36,16 +34,14 @@ export class DatabaseInitializationService {
   /**
    * Initialize database with migrations and optional seeding
    */
-  async initialize(options: {
-    runMigrations?: boolean;
-    runSeeders?: boolean;
-    force?: boolean;
-  } = {}): Promise<void> {
-    const {
-      runMigrations = true,
-      runSeeders = false,
-      force = false,
-    } = options;
+  async initialize(
+    options: {
+      runMigrations?: boolean;
+      runSeeders?: boolean;
+      force?: boolean;
+    } = {}
+  ): Promise<void> {
+    const { runMigrations = true, runSeeders = false, force = false } = options;
 
     // Prevent multiple initializations unless forced
     if (this.initialized && !force) {
@@ -58,7 +54,8 @@ export class DatabaseInitializationService {
 
       // Run migrations if enabled
       if (runMigrations) {
-        const migrationRequired = await this.migrationAdapter.isMigrationRequired();
+        const migrationRequired =
+          await this.migrationAdapter.isMigrationRequired();
         if (migrationRequired || force) {
           await this.migrationAdapter.runMigrations();
         } else {
@@ -107,10 +104,12 @@ export class DatabaseInitializationService {
   /**
    * Force re-initialization
    */
-  async reinitialize(options: {
-    runMigrations?: boolean;
-    runSeeders?: boolean;
-  } = {}): Promise<void> {
+  async reinitialize(
+    options: {
+      runMigrations?: boolean;
+      runSeeders?: boolean;
+    } = {}
+  ): Promise<void> {
     this.initialized = false;
     await this.initialize({ ...options, force: true });
   }
