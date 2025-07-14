@@ -100,7 +100,11 @@ async function main() {
   let successFound = false;
 
   for (const { config, description, suggestedUrl } of configurations) {
-    const success = await testConnectionWithConfig(config, description, databaseUrl);
+    const success = await testConnectionWithConfig(
+      config,
+      description,
+      databaseUrl
+    );
 
     if (success && !successFound) {
       successFound = true;

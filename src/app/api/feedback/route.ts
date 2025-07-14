@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, testConnection } from "../../../../drizzle/config";
 import { feedback } from "../../../../drizzle/schema";
+import { ensureDbReady } from "../../../lib/db-init";
 
 export async function POST(req: NextRequest) {
   try {
+    // Ensure database is initialized and ready
+    await ensureDbReady();
+    
     // Test database connection first
     const isConnected = await testConnection();
     if (!isConnected) {
@@ -91,6 +95,9 @@ export async function POST(req: NextRequest) {
 // GET endpoint to retrieve feedback (for testing/admin purposes)
 export async function GET(req: NextRequest) {
   try {
+    // Ensure database is initialized and ready
+    await ensureDbReady();
+    
     const isConnected = await testConnection();
     if (!isConnected) {
       return NextResponse.json(
