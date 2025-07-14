@@ -21,12 +21,13 @@ console.log("=".repeat(50));
 
 async function testConnectionWithConfig(
   sslConfig: boolean | object,
-  description: string
+  description: string,
+  connectionString: string
 ): Promise<boolean> {
   console.log(`\n🧪 Testing: ${description}`);
 
   const pool = new Pool({
-    connectionString: DATABASE_URL,
+    connectionString: connectionString,
     ssl: sslConfig,
     max: 1,
     idleTimeoutMillis: 5000,
@@ -52,7 +53,14 @@ async function testConnectionWithConfig(
 }
 
 async function main() {
-  const originalUrl = new URL(DATABASE_URL);
+  if (!DATABASE_URL) {
+    console.error("❌ DATABASE_URL environment variable is required");
+    process.exit(1);
+  }
+
+  // TypeScript now knows DATABASE_URL is defined after the check
+  const databaseUrl: string = DATABASE_URL;
+  const originalUrl = new URL(databaseUrl);
   console.log(`Database Host: ${originalUrl.hostname}`);
   console.log(`Database Port: ${originalUrl.port || 5432}`);
   console.log(
@@ -64,14 +72,14 @@ async function main() {
       config: false,
       description: "No SSL (sslmode=disable)",
       suggestedUrl:
-        DATABASE_URL.replace(/[?&]sslmode=[^&]*/g, "") +
-        (DATABASE_URL.includes("?") ? "&" : "?") +
+        databaseUrl.replace(/[?&]sslmode=[^&]*/g, "") +
+        (databaseUrl.includes("?") ? "&" : "?") +
         "sslmode=disable",
     },
     {
       config: { rejectUnauthorized: false },
       description: "SSL with self-signed certificates allowed",
-      suggestedUrl: DATABASE_URL.replace(/sslmode=[^&]*/g, "sslmode=require"),
+      suggestedUrl: databaseUrl.replace(/sslmode=[^&]*/g, "sslmode=require"),
     },
     {
       config: {
@@ -80,19 +88,19 @@ async function main() {
         secureProtocol: "TLSv1_2_method",
       },
       description: "SSL with all certificate checks disabled",
-      suggestedUrl: DATABASE_URL.replace(/sslmode=[^&]*/g, "sslmode=require"),
+      suggestedUrl: databaseUrl.replace(/sslmode=[^&]*/g, "sslmode=require"),
     },
     {
       config: true,
       description: "SSL with full certificate verification",
-      suggestedUrl: DATABASE_URL.replace(/sslmode=[^&]*/g, "sslmode=require"),
+      suggestedUrl: databaseUrl.replace(/sslmode=[^&]*/g, "sslmode=require"),
     },
   ];
 
   let successFound = false;
 
   for (const { config, description, suggestedUrl } of configurations) {
-    const success = await testConnectionWithConfig(config, description);
+    const success = await testConnectionWithConfig(config, description, databaseUrl);
 
     if (success && !successFound) {
       successFound = true;
