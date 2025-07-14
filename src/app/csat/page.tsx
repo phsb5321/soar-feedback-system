@@ -2,6 +2,7 @@
 import { Button } from "@/components/atoms/Button/Button";
 import { Icon } from "@/components/atoms/Icon/Icon";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner/LoadingSpinner";
+import { Logo } from "@/components/atoms/Logo/Logo";
 import { Text } from "@/components/atoms/Text/Text";
 import { Box, Chip, Paper, Rating, TextField } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -185,28 +186,14 @@ function CSATContent() {
         px={{ xs: 2, sm: 4 }}
         className="relative z-10"
       >
-        <div className="text-center mb-6 sm:mb-8 md:mb-10">
-          <h1
-            className="mb-2 sm:mb-3 text-3xl sm:text-4xl md:text-5xl font-bold drop-shadow-lg tracking-widest"
-            style={{
-              background:
-                "linear-gradient(to right, #3b82f6, #8b5cf6, #ec4899)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              color: "#1f2937",
-            }}
-          >
-            SOAR
-          </h1>
-          <Text
-            variant="body"
-            color="secondary"
-            className="text-lg sm:text-xl font-medium tracking-wide opacity-80"
-            style={{ color: "#6b7280" }}
-          >
-            Avaliação e Feedback
-          </Text>
+        <div className="mb-6 sm:mb-8 md:mb-10">
+          <Logo
+            size="large"
+            showSubtitle={true}
+            subtitle="Avaliação e Feedback"
+            showDecorationLine={false}
+            theme="gradient"
+          />
         </div>
 
         <div className="w-full max-w-2xl mx-auto">
