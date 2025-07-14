@@ -65,15 +65,21 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## 🏗️ Project Structure
 
 ```
-src/
-├── adapters/          # External service adapters
-├── app/              # Next.js app router
-│   ├── api/          # API routes
-│   └── page.tsx      # Main page
-├── application/      # Use cases and business logic
-├── components/       # React components (atoms, molecules, organisms)
-├── domain/          # Domain models and business rules
-└── ports/           # Interface definitions
+├── docs/              # Project documentation
+├── drizzle/           # Database schema and migrations
+├── lib/               # Utility modules and helpers
+├── public/            # Static assets
+├── scripts/           # Build and utility scripts
+├── src/               # Application source code
+│   ├── adapters/      # External service adapters
+│   ├── app/           # Next.js app router
+│   │   ├── api/       # API routes
+│   │   └── page.tsx   # Main page
+│   ├── application/   # Use cases and business logic
+│   ├── components/    # React components (atoms, molecules, organisms)
+│   ├── domain/        # Domain models and business rules
+│   └── ports/         # Interface definitions
+└── tests/             # E2E and integration tests
 ```
 
 ## 🎯 Usage

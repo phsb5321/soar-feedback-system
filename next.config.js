@@ -7,7 +7,7 @@ const nextConfig = {
   turbopack: {
     resolveAlias: {
       // Alias punycode to an empty module to suppress warnings
-      punycode: require.resolve("./empty-module.js"),
+      punycode: require.resolve("./lib/empty-module.js"),
     },
   },
 

@@ -2,7 +2,7 @@
 
 /**
  * Database SSL Connection Troubleshooter
- * 
+ *
  * This script helps diagnose and fix SSL connection issues with PostgreSQL databases.
  * It tests different SSL configurations to find the one that works for your environment.
  */
@@ -19,9 +19,12 @@ if (!DATABASE_URL) {
 console.log("🔍 Testing PostgreSQL SSL Connection Configurations");
 console.log("=".repeat(50));
 
-async function testConnectionWithConfig(sslConfig: boolean | object, description: string): Promise<boolean> {
+async function testConnectionWithConfig(
+  sslConfig: boolean | object,
+  description: string
+): Promise<boolean> {
   console.log(`\n🧪 Testing: ${description}`);
-  
+
   const pool = new Pool({
     connectionString: DATABASE_URL,
     ssl: sslConfig,
@@ -52,40 +55,45 @@ async function main() {
   const originalUrl = new URL(DATABASE_URL);
   console.log(`Database Host: ${originalUrl.hostname}`);
   console.log(`Database Port: ${originalUrl.port || 5432}`);
-  console.log(`SSL Mode: ${originalUrl.searchParams.get('sslmode') || 'not specified'}`);
+  console.log(
+    `SSL Mode: ${originalUrl.searchParams.get("sslmode") || "not specified"}`
+  );
 
   const configurations = [
     {
       config: false,
       description: "No SSL (sslmode=disable)",
-      suggestedUrl: DATABASE_URL.replace(/[?&]sslmode=[^&]*/g, '') + (DATABASE_URL.includes('?') ? '&' : '?') + 'sslmode=disable'
+      suggestedUrl:
+        DATABASE_URL.replace(/[?&]sslmode=[^&]*/g, "") +
+        (DATABASE_URL.includes("?") ? "&" : "?") +
+        "sslmode=disable",
     },
     {
       config: { rejectUnauthorized: false },
       description: "SSL with self-signed certificates allowed",
-      suggestedUrl: DATABASE_URL.replace(/sslmode=[^&]*/g, 'sslmode=require')
+      suggestedUrl: DATABASE_URL.replace(/sslmode=[^&]*/g, "sslmode=require"),
     },
     {
-      config: { 
-        rejectUnauthorized: false, 
+      config: {
+        rejectUnauthorized: false,
         checkServerIdentity: () => undefined,
-        secureProtocol: 'TLSv1_2_method'
+        secureProtocol: "TLSv1_2_method",
       },
       description: "SSL with all certificate checks disabled",
-      suggestedUrl: DATABASE_URL.replace(/sslmode=[^&]*/g, 'sslmode=require')
+      suggestedUrl: DATABASE_URL.replace(/sslmode=[^&]*/g, "sslmode=require"),
     },
     {
       config: true,
       description: "SSL with full certificate verification",
-      suggestedUrl: DATABASE_URL.replace(/sslmode=[^&]*/g, 'sslmode=require')
-    }
+      suggestedUrl: DATABASE_URL.replace(/sslmode=[^&]*/g, "sslmode=require"),
+    },
   ];
 
   let successFound = false;
 
   for (const { config, description, suggestedUrl } of configurations) {
     const success = await testConnectionWithConfig(config, description);
-    
+
     if (success && !successFound) {
       successFound = true;
       console.log("\n🎉 RECOMMENDED SOLUTION:");
@@ -101,7 +109,9 @@ async function main() {
     console.log("\n🔧 TROUBLESHOOTING STEPS:");
     console.log("1. Check if your PostgreSQL server is running");
     console.log("2. Verify the hostname and port are correct");
-    console.log("3. Ensure your database server allows connections from this IP");
+    console.log(
+      "3. Ensure your database server allows connections from this IP"
+    );
     console.log("4. Check firewall settings");
     console.log("5. Verify database credentials");
   }
