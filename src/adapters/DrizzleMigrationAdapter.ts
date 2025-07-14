@@ -1,17 +1,17 @@
-import { migrate } from "drizzle-orm/postgres-js/migrator";
-import { getDb } from "../../drizzle/config";
 import {
+  MigrationError,
   MigrationPort,
   MigrationStatus,
-  MigrationError,
 } from "@/ports/MigrationPort";
 import { sql } from "drizzle-orm";
-import path from "path";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
 import fs from "fs";
+import path from "path";
+import { getDb } from "../../drizzle/config";
 
 /**
  * Drizzle ORM Migration Adapter
- * 
+ *
  * Implements MigrationPort using Drizzle ORM for PostgreSQL
  * following hexagonal architecture principles.
  */
@@ -28,24 +28,28 @@ export class DrizzleMigrationAdapter implements MigrationPort {
   async runMigrations(): Promise<void> {
     try {
       console.log("🔄 Running database migrations...");
-      
+
       const db = await getDb();
-      
+
       // Ensure migrations folder exists
       if (!fs.existsSync(this.migrationsFolder)) {
-        console.log("⚠️ No migrations folder found, creating database schema...");
+        console.log(
+          "⚠️ No migrations folder found, creating database schema..."
+        );
         await this.createSchema();
         return;
       }
 
       // Run migrations using Drizzle
       await migrate(db, { migrationsFolder: this.migrationsFolder });
-      
+
       console.log("✅ Database migrations completed successfully");
     } catch (error) {
       const migrationError: MigrationError = {
         name: "MigrationError",
-        message: `Migration failed: ${error instanceof Error ? error.message : String(error)}`,
+        message: `Migration failed: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
         code: "MIGRATION_FAILED",
         details: { originalError: error },
       };
@@ -62,7 +66,9 @@ export class DrizzleMigrationAdapter implements MigrationPort {
       return !status.isUpToDate || status.pending.length > 0;
     } catch {
       // If we can't check status, assume migration is required
-      console.warn("⚠️ Could not check migration status, assuming migration required");
+      console.warn(
+        "⚠️ Could not check migration status, assuming migration required"
+      );
       return true;
     }
   }
@@ -73,10 +79,10 @@ export class DrizzleMigrationAdapter implements MigrationPort {
   async getMigrationStatus(): Promise<MigrationStatus> {
     try {
       const db = await getDb();
-      
+
       // Check if __drizzle_migrations table exists
       const migrationsTableExists = await this.checkMigrationsTableExists();
-      
+
       if (!migrationsTableExists) {
         return {
           current: null,
@@ -89,20 +95,21 @@ export class DrizzleMigrationAdapter implements MigrationPort {
       // Get applied migrations from database
       const appliedMigrations: string[] = await db
         .execute(sql`SELECT id FROM __drizzle_migrations ORDER BY created_at`)
-        .then(result => result.rows.map(row => String(row.id)))
+        .then((result) => result.rows.map((row) => String(row.id)))
         .catch(() => []);
 
       // Get available migrations from filesystem
       const availableMigrations: string[] = await this.getAvailableMigrations();
-      
+
       // Calculate pending migrations
       const pending = availableMigrations.filter(
-        migration => !appliedMigrations.includes(migration)
+        (migration) => !appliedMigrations.includes(migration)
       );
 
-      const current = appliedMigrations.length > 0 
-        ? appliedMigrations[appliedMigrations.length - 1] 
-        : null;
+      const current =
+        appliedMigrations.length > 0
+          ? appliedMigrations[appliedMigrations.length - 1]
+          : null;
 
       return {
         current,
@@ -111,7 +118,11 @@ export class DrizzleMigrationAdapter implements MigrationPort {
         isUpToDate: pending.length === 0,
       };
     } catch (error) {
-      throw new Error(`Failed to get migration status: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `Failed to get migration status: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
   }
 
@@ -119,7 +130,9 @@ export class DrizzleMigrationAdapter implements MigrationPort {
    * Rollback migration (placeholder - Drizzle doesn't support rollbacks by default)
    */
   async rollbackMigration(): Promise<void> {
-    throw new Error("Migration rollback not supported in this implementation. Consider using database backups instead.");
+    throw new Error(
+      "Migration rollback not supported in this implementation. Consider using database backups instead."
+    );
   }
 
   /**
@@ -128,7 +141,7 @@ export class DrizzleMigrationAdapter implements MigrationPort {
   private async createSchema(): Promise<void> {
     try {
       const db = await getDb();
-      
+
       // Create feedback table directly
       await db.execute(sql`
         CREATE TABLE IF NOT EXISTS feedback (
@@ -143,7 +156,11 @@ export class DrizzleMigrationAdapter implements MigrationPort {
 
       console.log("✅ Database schema created successfully");
     } catch (error) {
-      throw new Error(`Failed to create schema: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `Failed to create schema: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
   }
 
@@ -177,8 +194,8 @@ export class DrizzleMigrationAdapter implements MigrationPort {
 
       const files = fs.readdirSync(this.migrationsFolder);
       return files
-        .filter(file => file.endsWith('.sql'))
-        .map(file => path.basename(file, '.sql'))
+        .filter((file) => file.endsWith(".sql"))
+        .map((file) => path.basename(file, ".sql"))
         .sort();
     } catch {
       return [];
