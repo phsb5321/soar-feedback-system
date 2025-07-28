@@ -1,6 +1,9 @@
 import { AudioRecordingButton } from "@/components/atoms/AudioRecordingButton/AudioRecordingButton";
+import { HelpButton } from "@/components/atoms/HelpButton/HelpButton";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner/LoadingSpinner";
+import { RecordingTimer } from "@/components/atoms/RecordingTimer/RecordingTimer";
 import { Text } from "@/components/atoms/Text/Text";
+import { useComponentAudio } from "@/contexts/AudioContext";
 
 export interface AudioRecordingSectionProps {
   isRecording: boolean;
@@ -21,44 +24,105 @@ export function AudioRecordingSection({
   onStopRecording,
   className = "",
 }: AudioRecordingSectionProps) {
+  const { playComponentAudio } = useComponentAudio("audio-recording-section");
+
+  const handleRecordingInstructionsHelp = () => {
+    playComponentAudio("recordingInstructions", 6).catch(() => {
+      console.info("Recording instructions audio blocked by browser");
+    });
+  };
+
   const getStatusText = () => {
-    if (isTranscribing) return "Transcrevendo áudio...";
-    if (isRecording) return "Gravando... Clique para parar";
-    return "Clique para gravar";
+    if (isTranscribing) return "🔄 Transcrevendo...";
+    if (isRecording) return "🔴 Gravando... Clique para parar";
+    return "🎤 Clique para gravar";
   };
 
   const getStatusColor = () => {
     if (isTranscribing) return "text-blue-600";
     if (isRecording) return "text-red-600";
-    return "text-gray-600";
+    return "text-gray-700";
+  };
+
+  const handleStartRecording = () => {
+    // User interaction allows audio to play
+    playComponentAudio("startRecording", 7).catch(() => {
+      console.info(
+        "Start recording audio blocked, proceeding without audio feedback"
+      );
+    });
+    onStartRecording();
+  };
+
+  const handleStopRecording = () => {
+    // User interaction allows audio to play
+    playComponentAudio("stopRecording", 7).catch(() => {
+      console.info(
+        "Stop recording audio blocked, proceeding without audio feedback"
+      );
+    });
+    onStopRecording();
   };
 
   return (
-    <div className={`space-y-4 ${className}`}>
-      <Text variant="h3" className="font-semibold text-gray-700">
-        1. Grave seu feedback
-      </Text>
+    <div className={`space-y-4 text-center ${className}`}>
+      {/* Status and Timer */}
+      <div className="flex flex-col items-center space-y-2">
+        <div className="flex items-center justify-center space-x-2">
+          <Text variant="body" className={getStatusColor()}>
+            {getStatusText()}
+          </Text>
+          {isTranscribing && <LoadingSpinner size="small" color="primary" />}
+        </div>
 
-      <div className="flex flex-col items-center space-y-4">
+        {isRecording && (
+          <div className="flex items-center justify-center">
+            <RecordingTimer isRecording={isRecording} />
+          </div>
+        )}
+      </div>
+
+      {/* Recording Button */}
+      <div className="flex justify-center">
         <AudioRecordingButton
           isRecording={isRecording}
+          onStartRecording={handleStartRecording}
+          onStopRecording={handleStopRecording}
           isDisabled={isTranscribing}
-          onStartRecording={onStartRecording}
-          onStopRecording={onStopRecording}
           size="large"
         />
+      </div>
 
-        <Text variant="body" className={`text-center ${getStatusColor()}`}>
-          {getStatusText()}
+      {/* Instructions with Help Button */}
+      <div className="space-y-1 relative">
+        {/* Help button for recording instructions */}
+        <div className="flex justify-center mb-2">
+          <HelpButton
+            ariaLabel="Ouvir instruções sobre gravação"
+            tooltip="Clique para ouvir instruções sobre como gravar"
+            onHelp={handleRecordingInstructionsHelp}
+            icon="speech"
+            size="small"
+            color="primary"
+          />
+        </div>
+
+        <Text
+          variant="caption"
+          className="text-gray-600 dark:text-gray-400 font-medium"
+        >
+          {isRecording
+            ? "Fale agora e clique novamente para parar"
+            : "Clique no microfone e comece a falar"}
         </Text>
 
-        {isTranscribing && (
-          <div className="flex items-center space-x-2">
-            <LoadingSpinner size="small" color="primary" />
-            <Text variant="body" className="text-blue-600">
-              Processando...
-            </Text>
-          </div>
+        {!isRecording && !isTranscribing && (
+          <Text
+            variant="caption"
+            className="text-gray-500 dark:text-gray-500 text-xs"
+          >
+            Certifique-se de estar em um ambiente silencioso
+          </Text>
         )}
       </div>
     </div>
