@@ -29,7 +29,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-geist-sans), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-feature-settings: "rlig" 1, "calt" 1;
   /* Mobile optimizations */
   -webkit-text-size-adjust: 100%;
@@ -37,6 +37,11 @@ body {
   text-size-adjust: 100%;
   /* Ensure text is visible during hydration */
   min-height: 100vh;
+  /* Better font rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  line-height: 1.6;
 }
 
 /* Ensure no flash of invisible text during hydration */
@@ -503,4 +508,76 @@ button, .group {
 .MuiPaper-root .text-red-600,
 .MuiPaper-root .text-red-500 {
   color: #dc2626 !important;
+}
+
+/* Accessibility and consistency improvements */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-geist-sans), 'Inter', system-ui, sans-serif;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+}
+
+/* Consistent button and interactive element styling */
+button, [role="button"] {
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+button:focus-visible, [role="button"]:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+/* Consistent spacing for form elements */
+input, textarea, select {
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+/* Emoji consistency across platforms */
+.emoji {
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+/* Better text contrast for accessibility */
+.text-high-contrast {
+  color: #111827;
+}
+
+.text-medium-contrast {
+  color: #374151;
+}
+
+.text-low-contrast {
+  color: #6b7280;
+}
+
+/* Loading states */
+.loading-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* Focus indicators for accessibility */
+.focus-ring:focus {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Smooth transitions for interactive elements */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

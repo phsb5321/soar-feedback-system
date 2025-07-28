@@ -27,6 +27,11 @@
     "db:start": "docker-compose up -d postgres",
     "db:stop": "docker-compose down",
     "db:reset": "docker-compose down && docker volume rm soar-feedback-system_postgres_data && docker-compose up -d postgres && sleep 5 && npm run db:migrate",
+    "audio:generate": "dotenv -e .env.local tsx scripts/generate-premium-audio.ts",
+    "audio:generate:curl": "./scripts/generate-audio-curl.sh",
+    "audio:test": "tsx scripts/test-audio.ts",
+    "audio:polish": "./scripts/polish-audio.sh",
+    "audio:workflow": "./scripts/audio-workflow.sh",
     "docker:dev": "docker-compose --profile full-stack up --build",
     "docker:db": "docker-compose up -d postgres",
     "docker:down": "docker-compose down",
@@ -42,10 +47,12 @@
     "drizzle-orm": "^0.44.2",
     "groq-sdk": "^0.26.0",
     "next": "15.3.4",
+    "openai": "^5.10.2",
     "pg": "^8.16.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-icons": "^5.5.0"
+    "react-icons": "^5.5.0",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
