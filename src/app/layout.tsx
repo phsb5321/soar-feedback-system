@@ -1,3 +1,5 @@
+import { AudioToggle } from "@/components/atoms/AudioToggle/AudioToggle";
+import { GlobalAudioInterceptor } from "@/components/providers/GlobalAudioInterceptor";
 import type { Metadata, Viewport } from "next";
 import { Fira_Code, Geist, Geist_Mono, Pacifico } from "next/font/google";
 import "./globals.css";
@@ -50,7 +52,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${pacifico.variable} ${firaCode.variable} antialiased`}
         suppressHydrationWarning
       >
+        <GlobalAudioInterceptor />
         {children}
+        <AudioToggle />
       </body>
     </html>
   );

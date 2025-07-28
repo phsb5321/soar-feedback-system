@@ -1,9 +1,18 @@
 "use client";
-import { Logo, Text } from "@/components/atoms";
+import { HelpButton, Logo, Text } from "@/components/atoms";
 import { SimpleFeedbackForm } from "@/components/organisms";
+import { AudioProvider, useAudioContext } from "@/contexts/AudioContext";
 import { Box } from "@mui/material";
 
-export default function Home() {
+function HomeContent() {
+  const { playPageAudio } = useAudioContext();
+
+  const handleWelcomeHelp = () => {
+    playPageAudio("welcome", 8).catch(() => {
+      console.info("Welcome audio blocked, proceeding without audio feedback");
+    });
+  };
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 transition-colors duration-500 px-4 py-8 sm:px-6 lg:px-8">
       <div
@@ -24,7 +33,7 @@ export default function Home() {
         px={{ xs: 2, sm: 4 }}
         className="relative z-10"
       >
-        <div className="mb-6 sm:mb-8 md:mb-10">
+        <div className="mb-6 sm:mb-8 md:mb-10 relative">
           <Logo
             size="large"
             showSubtitle={true}
@@ -32,6 +41,18 @@ export default function Home() {
             showDecorationLine={true}
             theme="gradient"
           />
+
+          {/* Help button for welcome/instructions */}
+          <div className="absolute -top-2 -right-2">
+            <HelpButton
+              ariaLabel="Ouvir explicação sobre o sistema SOAR"
+              tooltip="Clique para ouvir uma explicação sobre como usar o sistema"
+              onHelp={handleWelcomeHelp}
+              icon="info"
+              size="medium"
+              color="primary"
+            />
+          </div>
         </div>
 
         <SimpleFeedbackForm />
@@ -53,5 +74,13 @@ export default function Home() {
         </div>
       </Box>
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <AudioProvider pageId="home">
+      <HomeContent />
+    </AudioProvider>
   );
 }

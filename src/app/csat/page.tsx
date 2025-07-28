@@ -1,10 +1,12 @@
 "use client";
 import { Button } from "@/components/atoms/Button/Button";
+import { HelpButton } from "@/components/atoms/HelpButton/HelpButton";
 import { Icon } from "@/components/atoms/Icon/Icon";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner/LoadingSpinner";
 import { Logo } from "@/components/atoms/Logo/Logo";
 import { Text } from "@/components/atoms/Text/Text";
-import { Box, Chip, Paper, Rating, TextField } from "@mui/material";
+import { AudioProvider, useAudioContext } from "@/contexts/AudioContext";
+import { Box, Chip, Paper, Rating } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
@@ -16,8 +18,8 @@ interface CSATData {
 function CSATContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { playPageAudio } = useAudioContext();
   const [npsScore, setNpsScore] = useState<number | null>(null);
-  const [additionalComment, setAdditionalComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [csatData, setCsatData] = useState<CSATData | null>(null);
@@ -38,11 +40,11 @@ function CSATContent() {
   }, [searchParams, router]);
 
   const getNPSLabel = (score: number): string => {
-    if (score <= 2) return "Muito Insatisfeito";
-    if (score <= 4) return "Insatisfeito";
+    if (score <= 2) return "Muito Difícil";
+    if (score <= 4) return "Difícil";
     if (score <= 6) return "Neutro";
-    if (score <= 8) return "Satisfeito";
-    return "Muito Satisfeito";
+    if (score <= 8) return "Fácil";
+    return "Muito Fácil";
   };
 
   const getNPSColor = (score: number): string => {
@@ -57,6 +59,8 @@ function CSATContent() {
     if (!csatData) return;
 
     setIsSubmitting(true);
+    // No custom TTS - only use pre-recorded audio files
+
     try {
       const response = await fetch("/api/feedback", {
         method: "POST",
@@ -64,21 +68,35 @@ function CSATContent() {
         body: JSON.stringify({
           transcription: csatData.transcription,
           npsScore,
-          additionalComment,
         }),
       });
 
       if (response.ok) {
         setIsSuccess(true);
+        playPageAudio("submitSuccess", 8);
       } else {
         throw new Error("Failed to submit feedback");
       }
     } catch (error) {
       console.error("Error submitting feedback:", error);
+      playPageAudio("submitError", 8);
       alert("Erro ao enviar feedback. Tente novamente.");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleRatingChange = (_: unknown, newValue: number | null) => {
+    setNpsScore(newValue);
+    // No custom TTS - only visual feedback for rating selection
+  };
+
+  const handleCSATWelcomeHelp = () => {
+    playPageAudio("csatWelcome", 7).catch(() => {
+      console.info(
+        "CSAT welcome audio blocked, proceeding without audio feedback"
+      );
+    });
   };
 
   const handleGoBack = () => {
@@ -224,7 +242,7 @@ function CSATContent() {
           >
             <div className="space-y-8">
               {/* Header */}
-              <div className="text-center">
+              <div className="text-center relative">
                 <Text
                   variant="h3"
                   className="font-bold mb-2"
@@ -235,6 +253,18 @@ function CSATContent() {
                 <Text variant="body" style={{ color: "#6b7280" }}>
                   Sua opinião é muito importante para nós
                 </Text>
+
+                {/* Help button for CSAT instructions */}
+                <div className="absolute top-0 right-0">
+                  <HelpButton
+                    ariaLabel="Ouvir instruções sobre a avaliação"
+                    tooltip="Clique para ouvir instruções sobre como avaliar"
+                    onHelp={handleCSATWelcomeHelp}
+                    icon="help"
+                    size="small"
+                    color="info"
+                  />
+                </div>
               </div>
 
               {/* Transcription Summary */}
@@ -259,20 +289,25 @@ function CSATContent() {
 
               {/* NPS Rating Section */}
               <div className="space-y-6">
-                <Text
-                  variant="h3"
-                  className="font-semibold text-center"
-                  style={{ color: "#1f2937" }}
-                >
-                  Como você avaliaria sua experiência?
-                </Text>
+                <div className="text-center space-y-2">
+                  <Text
+                    variant="h3"
+                    className="font-semibold"
+                    style={{ color: "#1f2937" }}
+                  >
+                    ⭐ Avalie nossa experiência
+                  </Text>
+                  <Text variant="body" style={{ color: "#6b7280" }}>
+                    Como foi usar nosso sistema de feedback?
+                  </Text>
+                </div>
 
                 <div className="space-y-4">
                   <div className="flex flex-col items-center space-y-4">
                     <Rating
                       name="nps-rating"
                       value={npsScore}
-                      onChange={(_, newValue) => setNpsScore(newValue)}
+                      onChange={handleRatingChange}
                       max={10}
                       size="large"
                       sx={{
@@ -289,7 +324,7 @@ function CSATContent() {
                     />
                     <div className="text-center">
                       <Text variant="caption" style={{ color: "#6b7280" }}>
-                        0 = Muito Insatisfeito | 10 = Muito Satisfeito
+                        0 = Muito Difícil de Usar | 10 = Muito Fácil de Usar
                       </Text>
                       {npsScore !== null && (
                         <div className="mt-2">
@@ -309,69 +344,35 @@ function CSATContent() {
                 </div>
               </div>
 
-              {/* Additional Comment Section */}
-              <div className="space-y-4">
-                <Text
-                  variant="h3"
-                  className="font-semibold"
-                  style={{ color: "#1f2937" }}
-                >
-                  Comentário adicional (opcional)
-                </Text>
-                <TextField
-                  multiline
-                  rows={3}
-                  fullWidth
-                  placeholder="Deixe um comentário adicional sobre sua experiência..."
-                  value={additionalComment}
-                  onChange={(e) => setAdditionalComment(e.target.value)}
-                  variant="outlined"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2,
-                      backgroundColor: "rgba(249, 250, 251, 0.8)",
-                    },
-                    "& .MuiInputBase-input": {
-                      color: "#1f2937",
-                    },
-                    "& .MuiInputLabel-root": {
-                      color: "#6b7280",
-                    },
-                  }}
-                />
-              </div>
-
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button
                   variant="secondary"
                   onClick={handleGoBack}
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto flex items-center justify-center space-x-2"
                   style={{ color: "#6b7280", borderColor: "#d1d5db" }}
                 >
-                  <div className="flex items-center justify-center space-x-2">
-                    <Icon src="/arrow-left.svg" alt="Voltar" size={20} />
-                    <span>Voltar</span>
-                  </div>
+                  <span className="text-xl">⬅️</span>
+                  <span>Voltar</span>
                 </Button>
 
                 <Button
                   variant="primary"
                   size="lg"
                   onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="w-full sm:flex-1"
+                  disabled={isSubmitting || npsScore === null}
+                  className="w-full sm:flex-1 flex items-center justify-center space-x-2"
                 >
                   {isSubmitting ? (
-                    <div className="flex items-center justify-center space-x-2">
+                    <>
                       <LoadingSpinner size="small" color="white" />
                       <span>Enviando...</span>
-                    </div>
+                    </>
                   ) : (
-                    <div className="flex items-center justify-center space-x-2">
-                      <Icon src="/send.svg" alt="Enviar" size={20} />
-                      <span>Enviar Avaliação</span>
-                    </div>
+                    <>
+                      <span className="text-xl">📤</span>
+                      <span>Enviar</span>
+                    </>
                   )}
                 </Button>
               </div>
@@ -385,14 +386,16 @@ function CSATContent() {
 
 export default function CSATPage() {
   return (
-    <Suspense
-      fallback={
-        <main className="min-h-screen flex items-center justify-center">
-          <LoadingSpinner size="large" color="primary" />
-        </main>
-      }
-    >
-      <CSATContent />
-    </Suspense>
+    <AudioProvider pageId="csat">
+      <Suspense
+        fallback={
+          <main className="min-h-screen flex items-center justify-center">
+            <LoadingSpinner size="large" color="primary" />
+          </main>
+        }
+      >
+        <CSATContent />
+      </Suspense>
+    </AudioProvider>
   );
 }
