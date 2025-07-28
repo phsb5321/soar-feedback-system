@@ -54,7 +54,7 @@ export function AudioRecordingButton({
         ${
           isRecording
             ? "bg-red-500 hover:bg-red-600 animate-pulse"
-            : "bg-blue-500 hover:bg-blue-600"
+            : "bg-gray-700 hover:bg-gray-800"
         }
         ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}
         text-white shadow-lg

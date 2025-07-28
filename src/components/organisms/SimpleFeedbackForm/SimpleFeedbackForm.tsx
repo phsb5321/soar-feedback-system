@@ -1,12 +1,13 @@
 "use client";
 import { Button } from "@/components/atoms/Button/Button";
 import { ErrorMessage } from "@/components/atoms/ErrorMessage/ErrorMessage";
-import { Icon } from "@/components/atoms/Icon/Icon";
+import { HelpButton } from "@/components/atoms/HelpButton/HelpButton";
 import { Text } from "@/components/atoms/Text/Text";
 import {
   AudioRecordingSection,
   TranscriptionDisplaySection,
 } from "@/components/molecules";
+import { useComponentAudio } from "@/contexts/AudioContext";
 import { useAudioFeedback } from "@/hooks/useAudioFeedback";
 import { Paper } from "@mui/material";
 import { useRouter } from "next/navigation";
@@ -23,6 +24,7 @@ export function SimpleFeedbackForm({
   className = "",
 }: SimpleFeedbackFormProps) {
   const router = useRouter();
+  const { playComponentAudio } = useComponentAudio("simple-feedback-form");
 
   const {
     isRecording,
@@ -35,6 +37,12 @@ export function SimpleFeedbackForm({
     stopRecording,
     resetForm,
   } = useAudioFeedback();
+
+  const handleSuccessHelp = () => {
+    playComponentAudio("successMessage", 8).catch(() => {
+      console.info("Success audio blocked, proceeding without audio feedback");
+    });
+  };
 
   const handleProceedToCSAT = () => {
     if (transcription) {
@@ -69,14 +77,21 @@ export function SimpleFeedbackForm({
           border: "1px solid rgba(34, 197, 94, 0.3)",
         }}
       >
-        <div className="text-center space-y-6">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-            <Icon
-              src="/send.svg"
-              alt="Sucesso"
-              size={32}
-              className="text-green-600"
+        <div className="text-center space-y-6 relative">
+          {/* Help button for success message */}
+          <div className="absolute top-0 right-0">
+            <HelpButton
+              ariaLabel="Ouvir mensagem de sucesso"
+              tooltip="Clique para ouvir confirmação de sucesso"
+              onHelp={handleSuccessHelp}
+              icon="help"
+              size="small"
+              color="primary"
             />
+          </div>
+
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+            <span className="text-3xl">✅</span>
           </div>
           <Text variant="h3" className="font-bold" style={{ color: "#16a34a" }}>
             Feedback Enviado com Sucesso!
@@ -132,10 +147,10 @@ export function SimpleFeedbackForm({
               className="font-bold mb-2"
               style={{ color: "#1f2937" }}
             >
-              Sistema de Avaliação SOAR
+              🎙️ Sistema de Feedback SOAR
             </Text>
             <Text variant="body" style={{ color: "#6b7280" }}>
-              Compartilhe sua experiência conosco
+              Grave seu feedback em voz
             </Text>
           </div>
 
@@ -150,62 +165,32 @@ export function SimpleFeedbackForm({
           {/* Transcription Display Section - Show after recording stops */}
           {!isRecording && transcription && (
             <>
-              <TranscriptionDisplaySection transcription={transcription} />
+              <TranscriptionDisplaySection
+                transcription={transcription}
+                audioBlob={audioBlob || undefined}
+              />
 
-              {/* Action buttons for transcription review */}
-              <div className="space-y-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-5 h-5 text-blue-600 mt-0.5">
-                      <svg fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <div className="flex-1">
-                      <Text
-                        variant="body"
-                        className="font-medium"
-                        style={{ color: "#1f2937" }}
-                      >
-                        Revise sua transcrição
-                      </Text>
-                      <Text variant="caption" style={{ color: "#6b7280" }}>
-                        Verifique se a transcrição está correta. Você pode
-                        regravar se necessário ou prosseguir para a avaliação.
-                      </Text>
-                    </div>
-                  </div>
-                </div>
+              {/* Simplified action buttons with icons */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button
+                  variant="secondary"
+                  onClick={handleReRecord}
+                  className="w-full sm:w-auto flex items-center justify-center space-x-2"
+                  style={{ color: "#6b7280", borderColor: "#d1d5db" }}
+                >
+                  <span className="text-xl">🔄</span>
+                  <span>Regravar</span>
+                </Button>
 
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button
-                    variant="secondary"
-                    onClick={handleReRecord}
-                    className="w-full sm:w-auto"
-                    style={{ color: "#6b7280", borderColor: "#d1d5db" }}
-                  >
-                    <div className="flex items-center justify-center space-x-2">
-                      <Icon src="/mic.svg" alt="Regravar" size={20} />
-                      <span>Regravar</span>
-                    </div>
-                  </Button>
-
-                  <Button
-                    variant="primary"
-                    onClick={handleProceedToCSAT}
-                    disabled={!transcription || isTranscribing}
-                    className="w-full sm:flex-1"
-                  >
-                    <div className="flex items-center justify-center space-x-2">
-                      <Icon src="/arrow-right.svg" alt="Continuar" size={20} />
-                      <span>Continuar para Avaliação</span>
-                    </div>
-                  </Button>
-                </div>
+                <Button
+                  variant="primary"
+                  onClick={handleProceedToCSAT}
+                  disabled={!transcription || isTranscribing}
+                  className="w-full sm:flex-1 flex items-center justify-center space-x-2"
+                >
+                  <span className="text-xl">▶️</span>
+                  <span>Continuar</span>
+                </Button>
               </div>
             </>
           )}
