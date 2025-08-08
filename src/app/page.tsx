@@ -54,7 +54,7 @@ function HomeContent() {
             showSubtitle={true}
             subtitle="Sistema de Avaliação e Feedback"
             showDecorationLine={true}
-            theme="white"
+            theme="gradient"
           />
 
           {/* Help button for welcome/instructions */}
@@ -79,18 +79,28 @@ function HomeContent() {
             variant="caption"
             color="secondary"
             className="text-xs sm:text-sm font-medium on-dark-bg"
+            style={{
+              color: "#ffffff",
+              fontWeight: "500",
+              textShadow: "0 1px 3px rgba(0, 0, 0, 0.4)",
+            }}
           >
             Powered by AI • Seguro e Privado
           </Text>
           <div className="flex items-center justify-center gap-2">
             <div
               className="w-2 h-2 rounded-full animate-pulse"
-              style={{ backgroundColor: colors.success }}
+              style={{ backgroundColor: "#22c55e" }}
             />
             <Text
               variant="caption"
               color="secondary"
               className="text-xs on-dark-bg"
+              style={{
+                color: "#ffffff",
+                fontWeight: "500",
+                textShadow: "0 1px 3px rgba(0, 0, 0, 0.4)",
+              }}
             >
               Sistema Online
             </Text>
