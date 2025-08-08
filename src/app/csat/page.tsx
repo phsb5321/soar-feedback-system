@@ -18,7 +18,7 @@ interface CSATData {
 function CSATContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { playPageAudio } = useAudioContext();
+  const { playPageAudio, playProtectedPageAudio } = useAudioContext();
   const [npsScore, setNpsScore] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -92,9 +92,9 @@ function CSATContent() {
   };
 
   const handleCSATWelcomeHelp = () => {
-    playPageAudio("csatWelcome", 7).catch(() => {
+    playProtectedPageAudio("csatWelcome").catch(() => {
       console.info(
-        "CSAT welcome audio blocked, proceeding without audio feedback"
+        "CSAT welcome audio blocked, proceeding without audio feedback",
       );
     });
   };

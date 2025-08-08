@@ -30,7 +30,7 @@ interface UseGlobalAudioInterceptorOptions {
  * This ensures that any user action anywhere in the app will stop help audio
  */
 export function useGlobalAudioInterceptor(
-  options: UseGlobalAudioInterceptorOptions = {}
+  options: UseGlobalAudioInterceptorOptions = {},
 ) {
   const {
     events = ["click", "keydown", "touchstart"],
@@ -39,13 +39,13 @@ export function useGlobalAudioInterceptor(
     preventDefault = false,
   } = options;
 
-  const { isPlaying, stopAudio } = useAudioStore();
+  const { isPlaying, isProtectedPlaying, stopAudio } = useAudioStore();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const handleUserInteraction = (event: Event) => {
-      // Only stop audio if something is currently playing
-      if (!isPlaying) {
+      // Only stop audio if something is currently playing AND it's not protected
+      if (!isPlaying || isProtectedPlaying) {
         return;
       }
 
@@ -60,14 +60,14 @@ export function useGlobalAudioInterceptor(
           stopAudio();
           console.log(
             `Audio stopped due to user interaction: ${event.type} on`,
-            event.target
+            event.target,
           );
         }, stopDelay);
       } else {
         stopAudio();
         console.log(
           `Audio stopped due to user interaction: ${event.type} on`,
-          event.target
+          event.target,
         );
       }
 
@@ -95,11 +95,19 @@ export function useGlobalAudioInterceptor(
         document.removeEventListener(
           eventType,
           handleUserInteraction,
-          useCapture
+          useCapture,
         );
       });
     };
-  }, [isPlaying, stopAudio, events, useCapture, stopDelay, preventDefault]);
+  }, [
+    isPlaying,
+    isProtectedPlaying,
+    stopAudio,
+    events,
+    useCapture,
+    stopDelay,
+    preventDefault,
+  ]);
 
   // Return current state for potential debugging
   return {

@@ -1,4 +1,5 @@
 import { AudioToggle } from "@/components/atoms/AudioToggle/AudioToggle";
+import { AudioBlockingOverlay } from "@/components/providers/AudioBlockingOverlay";
 import { GlobalAudioInterceptor } from "@/components/providers/GlobalAudioInterceptor";
 import type { Metadata, Viewport } from "next";
 import { Fira_Code, Geist, Geist_Mono, Pacifico } from "next/font/google";
@@ -53,6 +54,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <GlobalAudioInterceptor />
+        <AudioBlockingOverlay />
         {children}
         <AudioToggle />
       </body>

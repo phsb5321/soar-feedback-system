@@ -9,25 +9,28 @@ The SOAR (Sistema de Transcrição de Áudio) Feedback System is a modern web ap
 The system follows a **Hexagonal Architecture** pattern with clean separation of concerns:
 
 - **Domain Layer**: Core business logic and entities
-- **Application Layer**: Use cases and application services  
+- **Application Layer**: Use cases and application services
 - **Infrastructure Layer**: External integrations and adapters
 - **Presentation Layer**: React components and user interface
 
 ## 🎵 Key Features
 
 ### Audio System
+
 - **Pre-recorded Audio**: High-quality Brazilian Portuguese help messages
 - **Global Interceptor**: Stops audio on any user interaction
 - **Smart Queue Management**: Prevents audio loops and conflicts
 - **Accessibility**: Full keyboard and screen reader support
 
 ### User Interface
+
 - **Atomic Design**: Modular component architecture
 - **Material-UI**: Consistent design system with custom theming
 - **Responsive Design**: Mobile-first approach with accessibility
 - **Help System**: Context-aware help buttons with audio guidance
 
 ### Transcription Service
+
 - **Real-time Processing**: Groq API integration for audio transcription
 - **File Upload**: Support for various audio formats
 - **Error Handling**: Robust error management and user feedback
@@ -36,18 +39,21 @@ The system follows a **Hexagonal Architecture** pattern with clean separation of
 ## 📊 Technical Stack
 
 ### Frontend
+
 - **Next.js 15**: React framework with App Router
 - **TypeScript**: Full type safety and development experience
 - **Zustand**: State management for audio system
 - **Material-UI**: Component library and design system
 
 ### Backend Services
+
 - **Groq API**: Real-time audio transcription
 - **PostgreSQL**: Database with Drizzle ORM
 - **OpenAI TTS**: Dynamic audio generation (optional)
-- **Docker**: Containerized deployment
+- **Neon Database**: Cloud PostgreSQL hosting
 
 ### Development Tools
+
 - **ESLint**: Code quality and consistency
 - **Playwright**: End-to-end testing
 - **pnpm**: Package management
@@ -56,6 +62,7 @@ The system follows a **Hexagonal Architecture** pattern with clean separation of
 ## 🎯 Current Status
 
 ### ✅ Completed Features
+
 - **Core Audio System**: Complete with global interceptor
 - **UI/UX Components**: Atomic design implementation
 - **Help System**: Context-aware help buttons
@@ -67,6 +74,7 @@ The system follows a **Hexagonal Architecture** pattern with clean separation of
 - **Deployment**: Production-ready configuration
 
 ### 🎯 Architecture Goals Achieved
+
 - **Clean Code**: Well-organized, maintainable codebase
 - **Type Safety**: Full TypeScript coverage
 - **Performance**: Optimized audio and UI performance
@@ -101,6 +109,7 @@ soar-feedback-system/
 ## 🚀 Getting Started
 
 ### Development
+
 ```bash
 # Install dependencies
 pnpm install
@@ -113,6 +122,7 @@ pnpm test
 ```
 
 ### Production
+
 ```bash
 # Build for production
 pnpm build
@@ -137,4 +147,4 @@ pnpm start
 
 ---
 
-*For detailed technical documentation, see the [docs](./docs/) directory.*
+_For detailed technical documentation, see the [docs](./docs/) directory._

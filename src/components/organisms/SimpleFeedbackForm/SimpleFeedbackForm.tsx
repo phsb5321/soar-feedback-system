@@ -7,8 +7,9 @@ import {
   AudioRecordingSection,
   TranscriptionDisplaySection,
 } from "@/components/molecules";
-import { useComponentAudio } from "@/contexts/AudioContext";
+
 import { useAudioFeedback } from "@/hooks/useAudioFeedback";
+import { useProtectedAudio } from "@/hooks/useProtectedAudio";
 import { Paper } from "@mui/material";
 import { useRouter } from "next/navigation";
 
@@ -24,7 +25,8 @@ export function SimpleFeedbackForm({
   className = "",
 }: SimpleFeedbackFormProps) {
   const router = useRouter();
-  const { playComponentAudio } = useComponentAudio("simple-feedback-form");
+
+  const { playProtectedAudio } = useProtectedAudio();
 
   const {
     isRecording,
@@ -39,7 +41,7 @@ export function SimpleFeedbackForm({
   } = useAudioFeedback();
 
   const handleSuccessHelp = () => {
-    playComponentAudio("successMessage", 8).catch(() => {
+    playProtectedAudio("successMessage").catch(() => {
       console.info("Success audio blocked, proceeding without audio feedback");
     });
   };

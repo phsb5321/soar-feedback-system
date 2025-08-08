@@ -1,13 +1,15 @@
 "use client";
 import { useAdvancedAudio } from "@/hooks/useAdvancedAudio";
+import { useProtectedAudio } from "@/hooks/useProtectedAudio";
 import { AudioMessageKey } from "@/lib/audioMessages";
 import { createContext, ReactNode, useContext, useEffect, useRef } from "react";
 
 interface AudioContextValue {
   playPageAudio: (
     messageKey: AudioMessageKey,
-    priority?: number
+    priority?: number,
   ) => Promise<boolean>;
+  playProtectedPageAudio: (messageKey: AudioMessageKey) => Promise<boolean>;
   queuePageAudio: (messageKey: AudioMessageKey, priority?: number) => void;
   markPageInitialized: () => void;
   isPageInitialized: boolean;
@@ -26,6 +28,7 @@ interface AudioProviderProps {
  */
 export function AudioProvider({ children, pageId }: AudioProviderProps) {
   const audio = useAdvancedAudio();
+  const protectedAudio = useProtectedAudio();
   const pageInitialized = useRef(false);
   const playedPageAudios = useRef(new Set<string>());
 
@@ -35,7 +38,7 @@ export function AudioProvider({ children, pageId }: AudioProviderProps) {
 
   const playPageAudio = async (
     messageKey: AudioMessageKey,
-    priority = 5
+    priority = 5,
   ): Promise<boolean> => {
     const audioKey = `${pageId}-${messageKey}`;
 
@@ -50,6 +53,14 @@ export function AudioProvider({ children, pageId }: AudioProviderProps) {
       playedPageAudios.current.add(audioKey);
     }
     return result;
+  };
+
+  const playProtectedPageAudio = async (
+    messageKey: AudioMessageKey,
+  ): Promise<boolean> => {
+    // Protected audio always plays, regardless of previous plays
+    // This is because help audio should be available whenever requested
+    return await protectedAudio.playProtectedAudio(messageKey);
   };
 
   const queuePageAudio = (messageKey: AudioMessageKey, priority = 5) => {
@@ -76,6 +87,7 @@ export function AudioProvider({ children, pageId }: AudioProviderProps) {
 
   const contextValue: AudioContextValue = {
     playPageAudio,
+    playProtectedPageAudio,
     queuePageAudio,
     markPageInitialized,
     isPageInitialized: pageInitialized.current,
@@ -108,7 +120,7 @@ export function useComponentAudio(componentId: string) {
 
   const playComponentAudio = async (
     messageKey: AudioMessageKey,
-    priority = 5
+    priority = 5,
   ): Promise<boolean> => {
     const audioKey = `${componentId}-${messageKey}`;
 

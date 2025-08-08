@@ -3,7 +3,7 @@ import { HelpButton } from "@/components/atoms/HelpButton/HelpButton";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner/LoadingSpinner";
 import { RecordingTimer } from "@/components/atoms/RecordingTimer/RecordingTimer";
 import { Text } from "@/components/atoms/Text/Text";
-import { useComponentAudio } from "@/contexts/AudioContext";
+import { useProtectedAudio } from "@/hooks/useProtectedAudio";
 
 export interface AudioRecordingSectionProps {
   isRecording: boolean;
@@ -24,10 +24,10 @@ export function AudioRecordingSection({
   onStopRecording,
   className = "",
 }: AudioRecordingSectionProps) {
-  const { playComponentAudio } = useComponentAudio("audio-recording-section");
+  const { playProtectedAudio } = useProtectedAudio();
 
   const handleRecordingInstructionsHelp = () => {
-    playComponentAudio("recordingInstructions", 6).catch(() => {
+    playProtectedAudio("recordingInstructions").catch(() => {
       console.info("Recording instructions audio blocked by browser");
     });
   };
@@ -45,22 +45,12 @@ export function AudioRecordingSection({
   };
 
   const handleStartRecording = () => {
-    // User interaction allows audio to play
-    playComponentAudio("startRecording", 7).catch(() => {
-      console.info(
-        "Start recording audio blocked, proceeding without audio feedback"
-      );
-    });
+    // User interaction - no audio feedback needed
     onStartRecording();
   };
 
   const handleStopRecording = () => {
-    // User interaction allows audio to play
-    playComponentAudio("stopRecording", 7).catch(() => {
-      console.info(
-        "Stop recording audio blocked, proceeding without audio feedback"
-      );
-    });
+    // User interaction - no audio feedback needed
     onStopRecording();
   };
 

@@ -26,7 +26,7 @@
 
 ### 4. Database Integration
 
-- **✅ PostgreSQL**: Dockerized local database for development
+- **✅ PostgreSQL**: Neon cloud database for all environments
 - **✅ Drizzle ORM**: Type-safe database operations
 - **✅ Schema**: Proper database schema with migrations
 - **✅ API Integration**: RESTful API endpoints for feedback submission
@@ -41,7 +41,7 @@
 
 ### 6. Development Environment
 
-- **✅ Docker**: PostgreSQL container for local development
+- **✅ Neon Database**: Cloud PostgreSQL for simplified deployment
 - **✅ Hot Reload**: Development server with fast refresh
 - **✅ Environment Variables**: Proper configuration management
 - **✅ Migration Scripts**: Database setup and migration system
@@ -141,11 +141,11 @@ SELECT * FROM feedback ORDER BY created_at DESC LIMIT 3;
 # Start development server
 npm run dev
 
-# Start database
-docker-compose up -d
+# Setup database (migrations)
+npm run db:migrate
 
-# Run migrations
-npx tsx drizzle/migrate.ts
+# Test database connection
+npm run db:test
 
 # Build for production
 npm run build
