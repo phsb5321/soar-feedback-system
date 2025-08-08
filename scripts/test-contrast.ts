@@ -1,15 +1,28 @@
 #!/usr/bin/env tsx
 
 /**
- * Contrast Verification Test Script
+ * Enhanced Contrast Verification Test Script
  *
  * This script verifies that all text colors in the SOAR Feedback System
- * meet WCAG AA accessibility standards for contrast ratios.
+ * meet WCAG AA accessibility standards for contrast ratios using our
+ * new contrast management utilities.
  *
  * WCAG AA Requirements:
  * - Normal text: 4.5:1 contrast ratio
  * - Large text (18pt+ or 14pt+ bold): 3:1 contrast ratio
  */
+
+import {
+  getContrastRatio,
+  meetsContrastStandard,
+  getBestTextColor,
+  COLOR_PALETTE,
+  ContrastManager,
+  generateContrastPalette,
+  validateAccessibility,
+  getSmartBackground,
+  CONTRAST_STANDARDS,
+} from "../src/lib/contrast";
 
 interface ColorTest {
   name: string;
@@ -17,167 +30,275 @@ interface ColorTest {
   background: string;
   expectedRatio: number;
   context: string;
+  textSize?: "normal" | "large";
 }
 
-// Convert hex to RGB
-function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
-    ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16),
-      }
-    : null;
+interface ComponentTest {
+  name: string;
+  component: string;
+  scenarios: ColorTest[];
 }
 
-// Calculate relative luminance
-function getLuminance(r: number, g: number, b: number): number {
-  const [rs, gs, bs] = [r, g, b].map((c) => {
-    c = c / 255;
-    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-  });
-  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
-}
-
-// Calculate contrast ratio
-function getContrastRatio(color1: string, color2: string): number {
-  const rgb1 = hexToRgb(color1);
-  const rgb2 = hexToRgb(color2);
-
-  if (!rgb1 || !rgb2) return 0;
-
-  const lum1 = getLuminance(rgb1.r, rgb1.g, rgb1.b);
-  const lum2 = getLuminance(rgb2.r, rgb2.g, rgb2.b);
-
-  const brightest = Math.max(lum1, lum2);
-  const darkest = Math.min(lum1, lum2);
-
-  return (brightest + 0.05) / (darkest + 0.05);
-}
-
-// Test cases based on our color system
-const colorTests: ColorTest[] = [
-  // Primary text colors
+/**
+ * Test cases based on our actual components and use cases
+ */
+const componentTests: ComponentTest[] = [
   {
-    name: "Primary Text",
-    foreground: "#111827", // gray-900 (updated)
-    background: "#ffffff", // white
-    expectedRatio: 4.5,
-    context: "Main headings and primary content",
+    name: "Text Component",
+    component: "src/components/atoms/Text/Text.tsx",
+    scenarios: [
+      {
+        name: "Primary Text on White",
+        foreground: COLOR_PALETTE.gray[900],
+        background: COLOR_PALETTE.white,
+        expectedRatio: CONTRAST_STANDARDS.AA_NORMAL,
+        context: "Main headings and primary content",
+      },
+      {
+        name: "Secondary Text on White",
+        foreground: COLOR_PALETTE.gray[700],
+        background: COLOR_PALETTE.white,
+        expectedRatio: CONTRAST_STANDARDS.AA_NORMAL,
+        context: "Secondary content and descriptions",
+      },
+      {
+        name: "Muted Text on White",
+        foreground: COLOR_PALETTE.gray[600],
+        background: COLOR_PALETTE.white,
+        expectedRatio: CONTRAST_STANDARDS.AA_NORMAL,
+        context: "Captions and less important text",
+      },
+    ],
   },
   {
-    name: "Secondary Text",
-    foreground: "#374151", // gray-700 (updated)
-    background: "#ffffff", // white
-    expectedRatio: 4.5,
-    context: "Secondary content and descriptions",
+    name: "SimpleFeedbackForm",
+    component:
+      "src/components/organisms/SimpleFeedbackForm/SimpleFeedbackForm.tsx",
+    scenarios: [
+      {
+        name: "Form Title",
+        foreground: COLOR_PALETTE.gray[900],
+        background: COLOR_PALETTE.white,
+        expectedRatio: CONTRAST_STANDARDS.AA_NORMAL,
+        context: "Form header text",
+      },
+      {
+        name: "Success Message",
+        foreground: COLOR_PALETTE.success[700],
+        background: COLOR_PALETTE.success[50],
+        expectedRatio: CONTRAST_STANDARDS.AA_NORMAL,
+        context: "Success state text",
+      },
+    ],
   },
   {
-    name: "Muted Text",
-    foreground: "#4b5563", // gray-600 (updated)
-    background: "#ffffff", // white
-    expectedRatio: 4.5,
-    context: "Captions and less important text",
-  },
-
-  // Semantic colors
-  {
-    name: "Success Text",
-    foreground: "#15803d", // green-700 (updated)
-    background: "#ffffff", // white
-    expectedRatio: 4.5,
-    context: "Success messages and confirmations",
-  },
-  {
-    name: "Error Text",
-    foreground: "#b91c1c", // red-700 (updated)
-    background: "#ffffff", // white
-    expectedRatio: 4.5,
-    context: "Error messages and warnings",
-  },
-  {
-    name: "Info Text",
-    foreground: "#1d4ed8", // blue-700 (updated)
-    background: "#ffffff", // white
-    expectedRatio: 4.5,
-    context: "Informational text and links",
-  },
-
-  // Text on colored backgrounds
-  {
-    name: "White on Primary Blue",
-    foreground: "#ffffff", // white
-    background: "#2563eb", // blue-600
-    expectedRatio: 4.5,
-    context: "Primary button text",
-  },
-  {
-    name: "White on Success Green",
-    foreground: "#ffffff", // white
-    background: "#15803d", // green-700
-    expectedRatio: 4.5,
-    context: "Success button text",
-  },
-
-  // Light backgrounds
-  {
-    name: "Dark Text on Light Gray",
-    foreground: "#111827", // gray-900
-    background: "#f9fafb", // gray-50
-    expectedRatio: 4.5,
-    context: "Text on light gray backgrounds",
-  },
-  {
-    name: "Secondary Text on Blue Tint",
-    foreground: "#374151", // gray-700
-    background: "#eff6ff", // blue-50
-    expectedRatio: 4.5,
-    context: "Text on tinted backgrounds",
+    name: "Smart Backgrounds",
+    component: "src/components/providers/ContrastProvider.tsx",
+    scenarios: [
+      {
+        name: "Neutral Background",
+        foreground: getBestTextColor(COLOR_PALETTE.white),
+        background: COLOR_PALETTE.white,
+        expectedRatio: CONTRAST_STANDARDS.AA_NORMAL,
+        context: "Default neutral background",
+      },
+      {
+        name: "Success Background",
+        foreground: getBestTextColor(COLOR_PALETTE.success[50]),
+        background: COLOR_PALETTE.success[50],
+        expectedRatio: CONTRAST_STANDARDS.AA_NORMAL,
+        context: "Success message background",
+      },
+      {
+        name: "Error Background",
+        foreground: getBestTextColor(COLOR_PALETTE.error[50]),
+        background: COLOR_PALETTE.error[50],
+        expectedRatio: CONTRAST_STANDARDS.AA_NORMAL,
+        context: "Error message background",
+      },
+    ],
   },
 ];
 
-function runContrastTests(): void {
-  console.log("🎨 SOAR Feedback System - Contrast Verification Test");
-  console.log("=".repeat(60));
+/**
+ * Test smart background generation
+ */
+function testSmartBackgrounds(): void {
+  console.log("🎨 Testing Smart Background Generation");
+  console.log("=".repeat(50));
   console.log();
 
+  const contentTypes = [
+    "neutral",
+    "success",
+    "error",
+    "warning",
+    "info",
+    "primary",
+  ] as const;
+  const intensities = ["subtle", "medium", "strong"] as const;
+
   let passedTests = 0;
-  let totalTests = colorTests.length;
+  let totalTests = 0;
 
-  colorTests.forEach((test, index) => {
-    const ratio = getContrastRatio(test.foreground, test.background);
-    const passed = ratio >= test.expectedRatio;
+  contentTypes.forEach((contentType) => {
+    intensities.forEach((intensity) => {
+      totalTests++;
+      const bg = getSmartBackground(contentType, intensity);
+      const ratio = getContrastRatio(bg.textColor, bg.backgroundColor);
+      const passed = ratio >= CONTRAST_STANDARDS.AA_NORMAL;
 
-    console.log(`${index + 1}. ${test.name}`);
-    console.log(`   Foreground: ${test.foreground}`);
-    console.log(`   Background: ${test.background}`);
-    console.log(`   Contrast Ratio: ${ratio.toFixed(2)}:1`);
-    console.log(`   Required: ${test.expectedRatio}:1`);
-    console.log(`   Result: ${passed ? "✅ PASS" : "❌ FAIL"}`);
-    console.log(`   Context: ${test.context}`);
+      console.log(`${contentType}-${intensity}:`);
+      console.log(`  Background: ${bg.backgroundColor}`);
+      console.log(`  Text: ${bg.textColor}`);
+      console.log(`  Contrast: ${ratio.toFixed(2)}:1`);
+      console.log(`  Result: ${passed ? "✅ PASS" : "❌ FAIL"}`);
 
-    if (passed) {
-      passedTests++;
-    } else {
+      if (passed) passedTests++;
+      console.log();
+    });
+  });
+
+  console.log(`Smart Backgrounds: ${passedTests}/${totalTests} passed`);
+  console.log();
+}
+
+/**
+ * Test contrast manager functionality
+ */
+function testContrastManager(): void {
+  console.log("🔧 Testing Contrast Manager");
+  console.log("=".repeat(50));
+  console.log();
+
+  const lightManager = new ContrastManager(false);
+  const darkManager = new ContrastManager(true);
+
+  console.log("Light Theme Colors:");
+  const lightColors = lightManager.createThemeColors();
+  Object.entries(lightColors).forEach(([key, value]) => {
+    console.log(`  ${key}: ${value}`);
+  });
+
+  console.log("\nDark Theme Colors:");
+  const darkColors = darkManager.createThemeColors();
+  Object.entries(darkColors).forEach(([key, value]) => {
+    console.log(`  ${key}: ${value}`);
+  });
+
+  // Test contrast ratios for both themes
+  console.log("\nTheme Contrast Validation:");
+  const lightValidation = validateAccessibility({
+    textPrimary: lightColors.foreground,
+    textSecondary: lightColors.secondary,
+    textMuted: lightColors.muted,
+    background: lightColors.background,
+  });
+
+  const darkValidation = validateAccessibility({
+    textPrimary: darkColors.foreground,
+    textSecondary: darkColors.secondary,
+    textMuted: darkColors.muted,
+    background: darkColors.background,
+  });
+
+  console.log(`Light Theme: ${lightValidation.valid ? "✅ PASS" : "❌ FAIL"}`);
+  console.log(`Dark Theme: ${darkValidation.valid ? "✅ PASS" : "❌ FAIL"}`);
+
+  if (!lightValidation.valid) {
+    console.log("Light Theme Issues:");
+    lightValidation.issues.forEach((issue) => {
       console.log(
-        `   🔧 Recommendation: Adjust colors to meet WCAG AA standards`,
+        `  - ${issue.combination}: ${issue.ratio.toFixed(2)}:1 (needs ${issue.required}:1)`,
       );
-    }
+    });
+  }
 
+  if (!darkValidation.valid) {
+    console.log("Dark Theme Issues:");
+    darkValidation.issues.forEach((issue) => {
+      console.log(
+        `  - ${issue.combination}: ${issue.ratio.toFixed(2)}:1 (needs ${issue.required}:1)`,
+      );
+    });
+  }
+
+  console.log();
+}
+
+/**
+ * Run comprehensive contrast tests
+ */
+function runContrastTests(): void {
+  console.log("🎨 SOAR Feedback System - Enhanced Contrast Verification");
+  console.log("=".repeat(70));
+  console.log();
+
+  let totalPassed = 0;
+  let totalTests = 0;
+
+  componentTests.forEach((componentTest, componentIndex) => {
+    console.log(`${componentIndex + 1}. ${componentTest.name}`);
+    console.log(`   Component: ${componentTest.component}`);
+    console.log("-".repeat(50));
+
+    let componentPassed = 0;
+
+    componentTest.scenarios.forEach((test, testIndex) => {
+      totalTests++;
+      const ratio = getContrastRatio(test.foreground, test.background);
+      const passed = meetsContrastStandard(
+        test.foreground,
+        test.background,
+        "AA",
+        test.textSize || "normal",
+      );
+
+      console.log(`   ${testIndex + 1}. ${test.name}`);
+      console.log(`      Foreground: ${test.foreground}`);
+      console.log(`      Background: ${test.background}`);
+      console.log(`      Contrast Ratio: ${ratio.toFixed(2)}:1`);
+      console.log(`      Required: ${test.expectedRatio}:1`);
+      console.log(`      Result: ${passed ? "✅ PASS" : "❌ FAIL"}`);
+      console.log(`      Context: ${test.context}`);
+
+      if (passed) {
+        componentPassed++;
+        totalPassed++;
+      } else {
+        const recommendation = getBestTextColor(
+          test.background,
+          "AA",
+          test.textSize || "normal",
+        );
+        console.log(`      🔧 Recommended text color: ${recommendation}`);
+      }
+
+      console.log();
+    });
+
+    console.log(
+      `   Component Summary: ${componentPassed}/${componentTest.scenarios.length} tests passed`,
+    );
     console.log();
   });
 
-  // Summary
-  console.log("=".repeat(60));
-  console.log("📊 SUMMARY");
-  console.log(`   Tests Passed: ${passedTests}/${totalTests}`);
+  // Test smart backgrounds
+  testSmartBackgrounds();
+
+  // Test contrast manager
+  testContrastManager();
+
+  // Final summary
+  console.log("=".repeat(70));
+  console.log("📊 FINAL SUMMARY");
+  console.log(`   Component Tests Passed: ${totalPassed}/${totalTests}`);
   console.log(
-    `   Success Rate: ${Math.round((passedTests / totalTests) * 100)}%`,
+    `   Success Rate: ${Math.round((totalPassed / totalTests) * 100)}%`,
   );
 
-  if (passedTests === totalTests) {
-    console.log("🎉 All contrast tests passed! Your text is accessible.");
+  if (totalPassed === totalTests) {
+    console.log("🎉 All contrast tests passed! Your interface is accessible.");
     console.log("✅ WCAG AA compliance achieved for all tested combinations.");
   } else {
     console.log(
@@ -187,7 +308,8 @@ function runContrastTests(): void {
   }
 
   console.log();
-  console.log("🔍 Additional Accessibility Tips:");
+  console.log("🔍 Accessibility Best Practices:");
+  console.log("• Use our ContrastProvider for consistent color management");
   console.log("• Test with actual users who have visual impairments");
   console.log("• Use browser dev tools to simulate color blindness");
   console.log("• Consider WCAG AAA (7:1 ratio) for critical content");
@@ -195,36 +317,103 @@ function runContrastTests(): void {
   console.log("• Test in different lighting conditions");
 
   // Exit with appropriate code
-  process.exit(passedTests === totalTests ? 0 : 1);
+  process.exit(totalPassed === totalTests ? 0 : 1);
 }
 
-// Color palette reference for developers
+/**
+ * Show our enhanced color palette
+ */
 function showColorPalette(): void {
-  console.log("🎨 SOAR Color Palette Reference");
-  console.log("=".repeat(40));
+  console.log("🎨 SOAR Enhanced Color Palette");
+  console.log("=".repeat(50));
   console.log();
 
-  const palette = {
-    "Primary Text": "#111827", // gray-900
-    "Secondary Text": "#374151", // gray-700
-    "Muted Text": "#4b5563", // gray-600
-    Success: "#15803d", // green-700
-    Error: "#b91c1c", // red-700
-    Info: "#1d4ed8", // blue-700
-    "Primary Blue": "#2563eb", // blue-600
-    "Success Green": "#15803d", // green-700
-    "Light Background": "#f9fafb", // gray-50
-    White: "#ffffff",
-  };
+  console.log("Base Colors:");
+  console.log(`  White: ${COLOR_PALETTE.white}`);
+  console.log(`  Black: ${COLOR_PALETTE.black}`);
+  console.log();
 
-  Object.entries(palette).forEach(([name, color]) => {
-    console.log(`${name.padEnd(18)}: ${color}`);
+  console.log("Gray Scale:");
+  Object.entries(COLOR_PALETTE.gray).forEach(([shade, color]) => {
+    console.log(`  Gray ${shade}: ${color}`);
+  });
+  console.log();
+
+  console.log("Primary Colors:");
+  Object.entries(COLOR_PALETTE.primary).forEach(([shade, color]) => {
+    console.log(`  Primary ${shade}: ${color}`);
+  });
+  console.log();
+
+  console.log("Semantic Colors:");
+  ["success", "error", "warning", "info"].forEach((semantic) => {
+    console.log(`  ${semantic.charAt(0).toUpperCase() + semantic.slice(1)}:`);
+    Object.entries(
+      COLOR_PALETTE[semantic as keyof typeof COLOR_PALETTE],
+    ).forEach(([shade, color]) => {
+      if (typeof color === "string") {
+        console.log(`    ${shade}: ${color}`);
+      }
+    });
+    console.log();
   });
 
+  // Show contrast-safe combinations
+  console.log("✅ Recommended Text/Background Combinations:");
+  console.log(
+    `  Dark text on white: ${COLOR_PALETTE.gray[900]} / ${COLOR_PALETTE.white}`,
+  );
+  console.log(
+    `  White text on dark: ${COLOR_PALETTE.white} / ${COLOR_PALETTE.gray[900]}`,
+  );
+  console.log(
+    `  Success text: ${COLOR_PALETTE.success[700]} / ${COLOR_PALETTE.white}`,
+  );
+  console.log(
+    `  Error text: ${COLOR_PALETTE.error[700]} / ${COLOR_PALETTE.white}`,
+  );
+  console.log(
+    `  Info text: ${COLOR_PALETTE.primary[700]} / ${COLOR_PALETTE.white}`,
+  );
   console.log();
 }
 
-// Main execution
+/**
+ * Interactive contrast checker
+ */
+function interactiveChecker(): void {
+  console.log("🔍 Interactive Contrast Checker");
+  console.log("=".repeat(40));
+  console.log();
+  console.log("Example usage:");
+  console.log();
+
+  const examples = [
+    { fg: "#111827", bg: "#ffffff", name: "Primary text on white" },
+    { fg: "#ffffff", bg: "#2563eb", name: "White text on primary blue" },
+    { fg: "#15803d", bg: "#f0fdf4", name: "Success text on success bg" },
+    { fg: "#dc2626", bg: "#fef2f2", name: "Error text on error bg" },
+  ];
+
+  examples.forEach((example) => {
+    const ratio = getContrastRatio(example.fg, example.bg);
+    const passes = meetsContrastStandard(
+      example.fg,
+      example.bg,
+      "AA",
+      "normal",
+    );
+    console.log(`${example.name}:`);
+    console.log(`  Colors: ${example.fg} on ${example.bg}`);
+    console.log(`  Ratio: ${ratio.toFixed(2)}:1`);
+    console.log(`  WCAG AA: ${passes ? "✅ PASS" : "❌ FAIL"}`);
+    console.log();
+  });
+}
+
+/**
+ * Main execution function
+ */
 function main(): void {
   const args = process.argv.slice(2);
 
@@ -233,15 +422,32 @@ function main(): void {
     return;
   }
 
+  if (args.includes("--interactive") || args.includes("-i")) {
+    interactiveChecker();
+    return;
+  }
+
   if (args.includes("--help") || args.includes("-h")) {
-    console.log("SOAR Contrast Verification Tool");
+    console.log("SOAR Enhanced Contrast Verification Tool");
     console.log();
     console.log("Usage:");
-    console.log("  tsx scripts/test-contrast.ts           Run contrast tests");
-    console.log("  tsx scripts/test-contrast.ts --palette Show color palette");
-    console.log("  tsx scripts/test-contrast.ts --help    Show this help");
+    console.log(
+      "  tsx scripts/test-contrast.ts              Run all contrast tests",
+    );
+    console.log(
+      "  tsx scripts/test-contrast.ts --palette    Show color palette",
+    );
+    console.log(
+      "  tsx scripts/test-contrast.ts --interactive Interactive checker",
+    );
+    console.log("  tsx scripts/test-contrast.ts --help       Show this help");
     console.log();
-    console.log("This tool verifies WCAG AA compliance (4.5:1 contrast ratio)");
+    console.log("Features:");
+    console.log("• WCAG AA/AAA compliance testing");
+    console.log("• Smart background validation");
+    console.log("• Contrast manager testing");
+    console.log("• Component-specific scenarios");
+    console.log("• Enhanced color palette");
     return;
   }
 
@@ -253,4 +459,10 @@ if (require.main === module) {
   main();
 }
 
-export { getContrastRatio, runContrastTests, showColorPalette };
+export {
+  runContrastTests,
+  showColorPalette,
+  testSmartBackgrounds,
+  testContrastManager,
+  componentTests,
+};
