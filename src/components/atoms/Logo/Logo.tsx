@@ -89,7 +89,7 @@ export function Logo({
       case "gradient":
       case "solid":
       default:
-        return "text-gray-700 dark:text-gray-400";
+        return "text-gray-200";
     }
   };
 
