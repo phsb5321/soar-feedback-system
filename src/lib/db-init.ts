@@ -40,12 +40,24 @@ async function performInitialization(): Promise<void> {
       throw new Error("Database connection failed");
     }
 
+    // Verify we're connected to the correct database and schema
+    await verifyDatabaseContext();
+
     // Check if feedback table exists
     const tableExists = await checkTableExists();
 
     if (!tableExists) {
       console.log("⚠️  Feedback table doesn't exist, creating it...");
       await runMigrations();
+
+      // Verify table was created successfully
+      const tableCreated = await checkTableExists();
+      if (!tableCreated) {
+        throw new Error(
+          "Failed to create feedback table - table not found after migration",
+        );
+      }
+
       console.log("✅ Database initialized successfully");
     } else {
       console.log("✅ Database schema is up to date");
@@ -59,32 +71,65 @@ async function performInitialization(): Promise<void> {
   }
 }
 
-async function checkTableExists(): Promise<boolean> {
+async function verifyDatabaseContext(): Promise<void> {
   try {
-    // Try to query the table directly - if it fails, the table doesn't exist
-    await db.execute(sql`
-      SELECT 1 FROM feedback LIMIT 1;
+    // Get current database name and schema
+    const dbInfo = await db.execute(sql`
+      SELECT current_database() as db_name, current_schema() as schema_name;
     `);
 
-    console.log("✅ Feedback table exists and is accessible");
-    return true;
-  } catch (error: unknown) {
-    // Check if the error is specifically about the table not existing
-    const dbError = error as { code?: string; message?: string };
-    if (
-      dbError?.code === "42P01" ||
-      dbError?.message?.includes("does not exist")
-    ) {
+    const dbName = dbInfo.rows?.[0]?.db_name;
+    const schemaName = dbInfo.rows?.[0]?.schema_name;
+
+    console.log(`📍 Connected to database: ${dbName}, schema: ${schemaName}`);
+
+    // Ensure we're in the public schema
+    if (schemaName !== "public") {
+      console.log("🔄 Setting search path to public schema...");
+      await db.execute(sql`SET search_path TO public;`);
+    }
+  } catch (error) {
+    console.warn("Warning verifying database context:", error);
+  }
+}
+
+async function checkTableExists(): Promise<boolean> {
+  try {
+    // Use information_schema to check table existence more reliably
+    const result = await db.execute(sql`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public'
+        AND table_name = 'feedback'
+      ) as exists;
+    `);
+
+    const exists = Boolean(result.rows?.[0]?.exists);
+
+    if (exists) {
+      console.log("✅ Feedback table exists");
+      // Also verify we can access it
+      try {
+        await db.execute(sql`SELECT 1 FROM feedback LIMIT 1;`);
+        console.log("✅ Feedback table is accessible");
+      } catch (accessError) {
+        console.warn(
+          "⚠️  Feedback table exists but is not accessible:",
+          accessError,
+        );
+      }
+    } else {
       console.log("⚠️  Feedback table does not exist");
-      return false;
     }
 
-    // For other errors, log them but assume table exists to avoid unnecessary recreation
+    return exists;
+  } catch (error: unknown) {
+    const dbError = error as { code?: string; message?: string };
     console.warn(
       "Warning checking table existence:",
-      dbError.message || String(error)
+      dbError.message || String(error),
     );
-    return true;
+    return false;
   }
 }
 
@@ -92,26 +137,95 @@ async function runMigrations(): Promise<void> {
   try {
     console.log("🔄 Running database migrations...");
 
-    // Create the feedback table with proper structure
-    await db.execute(sql`
-      CREATE TABLE IF NOT EXISTS feedback (
-        id SERIAL PRIMARY KEY,
-        audio_url TEXT NOT NULL,
-        transcription TEXT NOT NULL,
-        csat INTEGER,
-        additional_comment TEXT,
-        created_at TIMESTAMP DEFAULT NOW() NOT NULL
-      );
+    // Ensure we're in the public schema
+    await db.execute(sql`SET search_path TO public;`);
+
+    // Check if table exists first
+    const tableExists = await db.execute(sql`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public'
+        AND table_name = 'feedback'
+      ) as exists;
     `);
 
-    // Add indexes for better performance
-    await db.execute(sql`
-      CREATE INDEX IF NOT EXISTS idx_feedback_created_at ON feedback(created_at DESC);
+    const exists = Boolean(tableExists.rows?.[0]?.exists);
+
+    if (exists) {
+      console.log("🔧 Table exists, checking if column type needs fixing...");
+
+      // Check the created_at column type
+      const columnInfo = await db.execute(sql`
+        SELECT data_type
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+        AND table_name = 'feedback'
+        AND column_name = 'created_at';
+      `);
+
+      const currentType = columnInfo.rows?.[0]?.data_type;
+      console.log(`   Current created_at type: ${currentType}`);
+
+      if (currentType === "timestamp with time zone") {
+        console.log(
+          "🔄 Converting timestamp with time zone to timestamp without time zone...",
+        );
+
+        // Convert the column type while preserving data
+        await db.execute(sql`
+          ALTER TABLE feedback
+          ALTER COLUMN created_at TYPE TIMESTAMP WITHOUT TIME ZONE
+          USING created_at AT TIME ZONE 'UTC';
+        `);
+
+        console.log("✅ Column type converted successfully!");
+      }
+
+      // Ensure indexes exist
+      console.log("📊 Ensuring indexes exist...");
+      await db.execute(sql`
+        CREATE INDEX IF NOT EXISTS idx_feedback_created_at ON feedback(created_at DESC);
+      `);
+
+      await db.execute(sql`
+        CREATE INDEX IF NOT EXISTS idx_feedback_csat ON feedback(csat) WHERE csat IS NOT NULL;
+      `);
+    } else {
+      // Create the feedback table with proper structure
+      console.log("🏗️  Creating feedback table...");
+      await db.execute(sql`
+        CREATE TABLE feedback (
+          id SERIAL PRIMARY KEY,
+          audio_url TEXT NOT NULL,
+          transcription TEXT NOT NULL,
+          csat INTEGER,
+          additional_comment TEXT,
+          created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL
+        );
+      `);
+
+      // Add indexes for better performance
+      console.log("📊 Creating indexes...");
+      await db.execute(sql`
+        CREATE INDEX idx_feedback_created_at ON feedback(created_at DESC);
+      `);
+
+      await db.execute(sql`
+        CREATE INDEX idx_feedback_csat ON feedback(csat) WHERE csat IS NOT NULL;
+      `);
+    }
+
+    // Verify the table structure is now correct
+    console.log("🔍 Verifying final table structure...");
+    const tableInfo = await db.execute(sql`
+      SELECT column_name, data_type, is_nullable
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+      AND table_name = 'feedback'
+      ORDER BY ordinal_position;
     `);
 
-    await db.execute(sql`
-      CREATE INDEX IF NOT EXISTS idx_feedback_csat ON feedback(csat) WHERE csat IS NOT NULL;
-    `);
+    console.log("📋 Final table structure:", tableInfo.rows);
 
     console.log("✅ Database migrations completed successfully!");
   } catch (error) {

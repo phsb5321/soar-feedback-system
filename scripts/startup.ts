@@ -52,7 +52,7 @@ async function main() {
       const isStructureValid = await validateTableStructure();
       if (!isStructureValid) {
         console.log(
-          "⚠️  Table structure needs updating, running migrations..."
+          "⚠️  Table structure needs updating, running migrations...",
         );
         await runMigrations();
       } else {
@@ -83,8 +83,8 @@ async function checkTableExists(): Promise<boolean> {
   try {
     const result = await db.execute(sql`
       SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' 
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public'
         AND table_name = 'feedback'
       ) as exists
     `);
@@ -99,9 +99,9 @@ async function validateTableStructure(): Promise<boolean> {
   try {
     // Check if all required columns exist
     const columns = await db.execute(sql`
-      SELECT column_name, data_type, is_nullable 
-      FROM information_schema.columns 
-      WHERE table_schema = 'public' 
+      SELECT column_name, data_type, is_nullable
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
       AND table_name = 'feedback'
       ORDER BY ordinal_position
     `);
@@ -128,7 +128,7 @@ async function validateTableStructure(): Promise<boolean> {
 
     for (const requiredCol of requiredColumns) {
       const existingCol = existingColumns.find(
-        (col) => col.name === requiredCol.name
+        (col) => col.name === requiredCol.name,
       );
       if (!existingCol) {
         console.log(`   Missing column: ${requiredCol.name}`);
@@ -136,14 +136,14 @@ async function validateTableStructure(): Promise<boolean> {
       }
       if (existingCol.type !== requiredCol.type) {
         console.log(
-          `   Column type mismatch: ${requiredCol.name} (expected: ${requiredCol.type}, got: ${existingCol.type})`
+          `   Column type mismatch: ${requiredCol.name} (expected: ${requiredCol.type}, got: ${existingCol.type})`,
         );
         return false;
       }
     }
 
     console.log(
-      `   All ${requiredColumns.length} columns are present and valid`
+      `   All ${requiredColumns.length} columns are present and valid`,
     );
     return true;
   } catch (error) {
@@ -164,7 +164,7 @@ async function runMigrations(): Promise<void> {
         transcription TEXT NOT NULL,
         csat INTEGER,
         additional_comment TEXT,
-        created_at TIMESTAMP DEFAULT NOW() NOT NULL
+        created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL
       );
     `);
 
