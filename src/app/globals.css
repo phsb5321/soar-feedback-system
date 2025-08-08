@@ -423,18 +423,111 @@ button {
   color: #4b5563 !important;
 }
 
-/* Ensure caption text is dark enough */
-.text-caption {
+/* ========================================================================= */
+/* ZONE-BASED TEXT COLOR SYSTEM - Comprehensive Text Visibility Solution    */
+/* ========================================================================= */
+
+/* ZONE 1: LOGO AREA (Dark Background) - Top of page */
+/* Logo title and subtitle on dark gradient background */
+.logo-zone,
+.logo-zone *,
+.logo-zone h1,
+.logo-zone p {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.logo-zone .text-gray-200,
+.logo-zone .text-gray-700,
+.logo-zone .text-gray-400 {
+  color: #f3f4f6 !important;
+  font-weight: 500 !important;
+}
+
+/* ZONE 2: WHITE CARD INTERIOR - All text inside cards/papers */
+/* Form content on white background */
+.MuiPaper-root,
+.MuiPaper-root *,
+.MuiPaper-root h1,
+.MuiPaper-root h2,
+.MuiPaper-root h3,
+.MuiPaper-root h4,
+.MuiPaper-root p,
+.MuiPaper-root span,
+.MuiPaper-root div,
+.card-zone,
+.card-zone * {
+  color: #1f2937 !important;
+}
+
+/* Specific card text elements */
+.MuiPaper-root .font-bold,
+.MuiPaper-root .font-semibold {
+  color: #1f2937 !important;
+  font-weight: 700 !important;
+}
+
+.MuiPaper-root .text-lg,
+.MuiPaper-root .text-xl,
+.MuiPaper-root .text-2xl {
+  color: #1f2937 !important;
+  font-weight: 700 !important;
+}
+
+/* Override any light text classes inside cards */
+.MuiPaper-root .text-gray-700,
+.MuiPaper-root .text-gray-600,
+.MuiPaper-root .text-gray-500,
+.MuiPaper-root .text-gray-400,
+.MuiPaper-root .text-blue-600,
+.MuiPaper-root .text-blue-700,
+.MuiPaper-root .text-red-600 {
   color: #374151 !important;
   font-weight: 500 !important;
 }
 
-/* Minimal card text targeting - only for specific elements */
-.MuiPaper-root h1,
-.MuiPaper-root h2,
-.MuiPaper-root h3 {
+/* ZONE 3: FOOTER AREA (Dark Background) - Bottom of page */
+/* Footer text on dark gradient background */
+.footer-zone,
+.footer-zone *,
+.footer-zone p,
+.footer-zone span,
+.footer-zone div {
+  color: #e5e7eb !important;
+  font-weight: 500 !important;
+}
+
+/* ZONE 4: MAIN BACKGROUND AREA (Dark Background) */
+/* Any text directly on the main dark background */
+body > main > *:not(.MuiPaper-root) {
+  color: #f3f4f6 !important;
+}
+
+/* Specific targeting for common elements on dark background */
+main .text-center:not(.MuiPaper-root .text-center) p,
+main .text-center:not(.MuiPaper-root .text-center) span {
+  color: #e5e7eb !important;
+  font-weight: 500 !important;
+}
+
+/* EMERGENCY OVERRIDES - Last resort rules */
+/* Force light colors for elements definitely on dark background */
+.on-dark-bg,
+.on-dark-bg * {
+  color: #f3f4f6 !important;
+  font-weight: 500 !important;
+}
+
+/* Force dark colors for elements definitely on light background */
+.on-light-bg,
+.on-light-bg * {
   color: #1f2937 !important;
-  font-weight: 700 !important;
+  font-weight: 500 !important;
+}
+
+/* Ensure caption text is readable in all contexts */
+.text-caption {
+  font-weight: 500 !important;
 }
 
 /* Loading states */
