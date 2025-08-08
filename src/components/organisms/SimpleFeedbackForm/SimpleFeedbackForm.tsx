@@ -95,14 +95,10 @@ export function SimpleFeedbackForm({
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
             <span className="text-3xl">✅</span>
           </div>
-          <Text variant="h3" className="font-bold" style={{ color: "#16a34a" }}>
+          <Text variant="h3" className="font-bold" color="success">
             Feedback Enviado com Sucesso!
           </Text>
-          <Text
-            variant="body"
-            className="max-w-md"
-            style={{ color: "#6b7280" }}
-          >
+          <Text variant="body" className="max-w-md" color="secondary">
             Obrigado por sua participação. Sua opinião é muito importante para
             nós.
           </Text>
@@ -144,14 +140,10 @@ export function SimpleFeedbackForm({
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center">
-            <Text
-              variant="h3"
-              className="font-bold mb-2"
-              style={{ color: "#1f2937" }}
-            >
+            <Text variant="h3" className="font-bold mb-2" color="primary">
               🎙️ Sistema de Feedback SOAR
             </Text>
-            <Text variant="body" style={{ color: "#6b7280" }}>
+            <Text variant="body" color="secondary">
               Grave seu feedback em voz
             </Text>
           </div>
@@ -178,7 +170,6 @@ export function SimpleFeedbackForm({
                   variant="secondary"
                   onClick={handleReRecord}
                   className="w-full sm:w-auto flex items-center justify-center space-x-2"
-                  style={{ color: "#6b7280", borderColor: "#d1d5db" }}
                 >
                   <span className="text-xl">🔄</span>
                   <span>Regravar</span>
