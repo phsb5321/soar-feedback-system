@@ -429,50 +429,12 @@ button {
   font-weight: 500 !important;
 }
 
-/* Force dark text inside white cards - highest priority */
+/* Minimal card text targeting - only for specific elements */
 .MuiPaper-root h1,
 .MuiPaper-root h2,
-.MuiPaper-root h3,
-.MuiPaper-root h4,
-.MuiPaper-root h5,
-.MuiPaper-root h6,
-.MuiPaper-root p,
-.MuiPaper-root span,
-.MuiPaper-root div,
-.MuiPaper-root .font-bold,
-.MuiPaper-root .font-semibold,
-.MuiPaper-root .text-gray-700,
-.MuiPaper-root .text-gray-600,
-.MuiPaper-root .text-gray-500,
-.MuiPaper-root .text-gray-400,
-.MuiPaper-root .text-blue-600,
-.MuiPaper-root .text-red-600 {
-  color: #1f2937 !important;
-}
-
-/* Specific targeting for form title */
-.MuiPaper-root .text-lg,
-.MuiPaper-root .text-xl,
-.MuiPaper-root .text-2xl {
+.MuiPaper-root h3 {
   color: #1f2937 !important;
   font-weight: 700 !important;
-}
-
-/* Logo subtitle - light on dark background (but not inside cards) */
-body > main .text-gray-200:not(.MuiPaper-root .text-gray-200) {
-  color: #f3f4f6 !important;
-  font-weight: 500 !important;
-}
-
-/* Force all text inside cards to be dark */
-.MuiPaper-root * {
-  color: #1f2937 !important;
-}
-
-/* Specific overrides for different text elements inside cards */
-.MuiPaper-root button,
-.MuiPaper-root button span {
-  color: inherit !important;
 }
 
 /* Loading states */
