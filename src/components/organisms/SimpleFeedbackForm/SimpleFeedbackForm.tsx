@@ -103,14 +103,14 @@ export function SimpleFeedbackForm({
           <Text
             variant="h3"
             className="font-bold"
-            style={{ color: colors.success }}
+            style={{ color: "#059669", fontWeight: "700" }}
           >
             Feedback Enviado com Sucesso!
           </Text>
           <Text
             variant="body"
             className="max-w-md"
-            style={{ color: colors.secondary }}
+            style={{ color: "#374151", fontWeight: "500" }}
           >
             Obrigado por sua participação. Sua opinião é muito importante para
             nós.
@@ -158,11 +158,14 @@ export function SimpleFeedbackForm({
             <Text
               variant="h3"
               className="font-bold mb-2"
-              style={{ color: colors.primary }}
+              style={{ color: "#1f2937", fontWeight: "700" }}
             >
               🎙️ Sistema de Feedback SOAR
             </Text>
-            <Text variant="body" style={{ color: colors.secondary }}>
+            <Text
+              variant="body"
+              style={{ color: "#374151", fontWeight: "500" }}
+            >
               Grave seu feedback em voz
             </Text>
           </div>
