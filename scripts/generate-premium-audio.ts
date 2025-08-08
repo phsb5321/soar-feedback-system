@@ -68,16 +68,28 @@ const PREMIUM_AUDIO_MESSAGES = {
 
 type AudioMessageKey = keyof typeof PREMIUM_AUDIO_MESSAGES;
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+let openai: OpenAI | null = null;
+
+function getOpenAIClient(): OpenAI {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error(
+        "OPENAI_API_KEY environment variable is missing or empty. Please provide it in your environment variables.",
+      );
+    }
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openai;
+}
 
 /**
  * Generate a single premium audio file with optimal Brazilian Portuguese settings
  */
 async function generatePremiumAudioFile(
   key: AudioMessageKey,
-  message: (typeof PREMIUM_AUDIO_MESSAGES)[AudioMessageKey]
+  message: (typeof PREMIUM_AUDIO_MESSAGES)[AudioMessageKey],
 ): Promise<string> {
   const audioDir = join(process.cwd(), "public", "audio");
 
@@ -89,11 +101,11 @@ async function generatePremiumAudioFile(
 
   console.log(`🎵 Generating premium pt-BR audio: ${key}`);
   console.log(
-    `   Voice: ${message.voice} | Speed: ${message.speed} | ${message.description}`
+    `   Voice: ${message.voice} | Speed: ${message.speed} | ${message.description}`,
   );
 
   try {
-    const mp3 = await openai.audio.speech.create({
+    const mp3 = await getOpenAIClient().audio.speech.create({
       model: "tts-1-hd", // Highest quality model
       voice: message.voice,
       input: message.text,
@@ -171,13 +183,13 @@ async function generateAllPremiumAudio(): Promise<void> {
 
   console.log("🎉 Premium audio generation complete!");
   console.log(
-    "🔊 All files generated with optimal Brazilian Portuguese pronunciation"
+    "🔊 All files generated with optimal Brazilian Portuguese pronunciation",
   );
 
   // Summary
   const successful = Object.values(results).filter((url) => url !== "").length;
   console.log(
-    `📈 Summary: ${successful}/${keys.length} files generated successfully`
+    `📈 Summary: ${successful}/${keys.length} files generated successfully`,
   );
 }
 
