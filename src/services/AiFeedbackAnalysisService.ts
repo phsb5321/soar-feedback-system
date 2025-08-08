@@ -14,7 +14,14 @@ interface AiAnalysisResult {
   sentimentConfidence: number;
 
   // Emotion Detection
-  emotion: "joy" | "anger" | "sadness" | "fear" | "surprise" | "disgust" | "neutral";
+  emotion:
+    | "joy"
+    | "anger"
+    | "sadness"
+    | "fear"
+    | "surprise"
+    | "disgust"
+    | "neutral";
   emotionConfidence: number;
 
   // Content Analysis
@@ -23,7 +30,13 @@ interface AiAnalysisResult {
   keyPhrases: string[];
 
   // Intent & Purpose
-  intent: "complaint" | "praise" | "suggestion" | "question" | "information" | "support";
+  intent:
+    | "complaint"
+    | "praise"
+    | "suggestion"
+    | "question"
+    | "information"
+    | "support";
   intentConfidence: number;
 
   // Language & Quality
@@ -38,7 +51,13 @@ interface AiAnalysisResult {
   urgencyScore: number;
   satisfactionPrediction: number;
   priorityLevel: "low" | "medium" | "high" | "critical";
-  department: "support" | "sales" | "product" | "engineering" | "management" | "legal";
+  department:
+    | "support"
+    | "sales"
+    | "product"
+    | "engineering"
+    | "management"
+    | "legal";
 
   // Extracted Entities
   productMentions: string[];
@@ -128,7 +147,10 @@ export class AiFeedbackAnalysisService {
   /**
    * Analyze feedback transcription and extract comprehensive insights
    */
-  async analyzeFeedback(transcription: string, csat?: number): Promise<AiAnalysisResult> {
+  async analyzeFeedback(
+    transcription: string,
+    csat?: number,
+  ): Promise<AiAnalysisResult> {
     try {
       const basicMetrics = this.calculateBasicMetrics(transcription);
 
@@ -138,7 +160,10 @@ export class AiFeedbackAnalysisService {
       try {
         aiAnalysis = await this.analyzeWithGroq(transcription, csat);
       } catch (groqError) {
-        console.warn("Groq analysis failed, falling back to OpenAI:", groqError);
+        console.warn(
+          "Groq analysis failed, falling back to OpenAI:",
+          groqError,
+        );
         aiAnalysis = await this.analyzeWithOpenAI(transcription, csat);
       }
 
@@ -168,7 +193,10 @@ export class AiFeedbackAnalysisService {
 
         // Business Intelligence
         urgencyScore: Math.max(0, Math.min(1, aiAnalysis.urgency)),
-        satisfactionPrediction: csat !== undefined ? csat / 10 : Math.max(0, Math.min(1, aiAnalysis.satisfaction)),
+        satisfactionPrediction:
+          csat !== undefined
+            ? csat / 10
+            : Math.max(0, Math.min(1, aiAnalysis.satisfaction)),
         priorityLevel: this.normalizePriority(aiAnalysis.priority),
         department: this.normalizeDepartment(aiAnalysis.department),
 
@@ -193,18 +221,17 @@ export class AiFeedbackAnalysisService {
         modelVersion: this.modelVersion,
         processedAt: new Date(),
       };
-
     } catch (error) {
       console.error("AI analysis failed:", error);
 
       // Return basic analysis with error
-      const basicMetrics = this.calculateBasicMetrics(transcription);
       return {
         ...this.getBasicFallbackAnalysis(transcription, csat),
-        ...basicMetrics,
+        ...this.calculateBasicMetrics(transcription),
         modelVersion: this.modelVersion,
         processedAt: new Date(),
-        processingError: error instanceof Error ? error.message : "Unknown error",
+        processingError:
+          error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -212,7 +239,10 @@ export class AiFeedbackAnalysisService {
   /**
    * Analyze with Groq (faster, cheaper)
    */
-  private async analyzeWithGroq(transcription: string, csat?: number): Promise<AnalysisPromptResponse> {
+  private async analyzeWithGroq(
+    transcription: string,
+    csat?: number,
+  ): Promise<AnalysisPromptResponse> {
     if (!this.groq) {
       throw new Error("Groq client not initialized");
     }
@@ -246,7 +276,10 @@ export class AiFeedbackAnalysisService {
   /**
    * Analyze with OpenAI (more accurate, more expensive)
    */
-  private async analyzeWithOpenAI(transcription: string, csat?: number): Promise<AnalysisPromptResponse> {
+  private async analyzeWithOpenAI(
+    transcription: string,
+    csat?: number,
+  ): Promise<AnalysisPromptResponse> {
     if (!this.openai) {
       throw new Error("OpenAI client not initialized");
     }
@@ -364,7 +397,10 @@ Guidelines:
    * Calculate basic text metrics
    */
   private calculateBasicMetrics(text: string) {
-    const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+    const words = text
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0);
     const characters = text.length;
 
     return {
@@ -376,76 +412,174 @@ Guidelines:
   /**
    * Normalization methods to ensure consistent data
    */
-  private normalizeSentiment(sentiment: string): "positive" | "negative" | "neutral" {
+  private normalizeSentiment(
+    sentiment: string,
+  ): "positive" | "negative" | "neutral" {
     const s = sentiment.toLowerCase();
     if (s.includes("positive") || s.includes("positiv")) return "positive";
     if (s.includes("negative") || s.includes("negativ")) return "negative";
     return "neutral";
   }
 
-  private normalizeEmotion(emotion: string): "joy" | "anger" | "sadness" | "fear" | "surprise" | "disgust" | "neutral" {
+  private normalizeEmotion(
+    emotion: string,
+  ): "joy" | "anger" | "sadness" | "fear" | "surprise" | "disgust" | "neutral" {
     const e = emotion.toLowerCase();
-    if (e.includes("joy") || e.includes("happiness") || e.includes("alegria")) return "joy";
-    if (e.includes("anger") || e.includes("raiva") || e.includes("irritation")) return "anger";
-    if (e.includes("sadness") || e.includes("tristeza") || e.includes("sad")) return "sadness";
-    if (e.includes("fear") || e.includes("medo") || e.includes("anxiety")) return "fear";
+    if (e.includes("joy") || e.includes("happiness") || e.includes("alegria"))
+      return "joy";
+    if (e.includes("anger") || e.includes("raiva") || e.includes("irritation"))
+      return "anger";
+    if (e.includes("sadness") || e.includes("tristeza") || e.includes("sad"))
+      return "sadness";
+    if (e.includes("fear") || e.includes("medo") || e.includes("anxiety"))
+      return "fear";
     if (e.includes("surprise") || e.includes("surpresa")) return "surprise";
-    if (e.includes("disgust") || e.includes("nojo") || e.includes("repugnance")) return "disgust";
+    if (e.includes("disgust") || e.includes("nojo") || e.includes("repugnance"))
+      return "disgust";
     return "neutral";
   }
 
-  private normalizeIntent(intent: string): "complaint" | "praise" | "suggestion" | "question" | "information" | "support" {
+  private normalizeIntent(
+    intent: string,
+  ):
+    | "complaint"
+    | "praise"
+    | "suggestion"
+    | "question"
+    | "information"
+    | "support" {
     const i = intent.toLowerCase();
-    if (i.includes("complaint") || i.includes("reclamação") || i.includes("problema")) return "complaint";
-    if (i.includes("praise") || i.includes("elogio") || i.includes("compliment")) return "praise";
-    if (i.includes("suggestion") || i.includes("sugestão") || i.includes("recommend")) return "suggestion";
-    if (i.includes("question") || i.includes("pergunta") || i.includes("dúvida")) return "question";
-    if (i.includes("support") || i.includes("suporte") || i.includes("ajuda")) return "support";
+    if (
+      i.includes("complaint") ||
+      i.includes("reclamação") ||
+      i.includes("problema")
+    )
+      return "complaint";
+    if (
+      i.includes("praise") ||
+      i.includes("elogio") ||
+      i.includes("compliment")
+    )
+      return "praise";
+    if (
+      i.includes("suggestion") ||
+      i.includes("sugestão") ||
+      i.includes("recommend")
+    )
+      return "suggestion";
+    if (
+      i.includes("question") ||
+      i.includes("pergunta") ||
+      i.includes("dúvida")
+    )
+      return "question";
+    if (i.includes("support") || i.includes("suporte") || i.includes("ajuda"))
+      return "support";
     return "information";
   }
 
-  private normalizePriority(priority: string): "low" | "medium" | "high" | "critical" {
+  private normalizePriority(
+    priority: string,
+  ): "low" | "medium" | "high" | "critical" {
     const p = priority.toLowerCase();
-    if (p.includes("critical") || p.includes("crítico") || p.includes("urgent")) return "critical";
-    if (p.includes("high") || p.includes("alto") || p.includes("importante")) return "high";
-    if (p.includes("low") || p.includes("baixo") || p.includes("minor")) return "low";
+    if (p.includes("critical") || p.includes("crítico") || p.includes("urgent"))
+      return "critical";
+    if (p.includes("high") || p.includes("alto") || p.includes("importante"))
+      return "high";
+    if (p.includes("low") || p.includes("baixo") || p.includes("minor"))
+      return "low";
     return "medium";
   }
 
-  private normalizeDepartment(department: string): "support" | "sales" | "product" | "engineering" | "management" | "legal" {
+  private normalizeDepartment(
+    department: string,
+  ): "support" | "sales" | "product" | "engineering" | "management" | "legal" {
     const d = department.toLowerCase();
-    if (d.includes("sales") || d.includes("vendas") || d.includes("comercial")) return "sales";
+    if (d.includes("sales") || d.includes("vendas") || d.includes("comercial"))
+      return "sales";
     if (d.includes("product") || d.includes("produto")) return "product";
-    if (d.includes("engineering") || d.includes("engenharia") || d.includes("tech")) return "engineering";
-    if (d.includes("management") || d.includes("gerência") || d.includes("diretor")) return "management";
-    if (d.includes("legal") || d.includes("jurídico") || d.includes("compliance")) return "legal";
+    if (
+      d.includes("engineering") ||
+      d.includes("engenharia") ||
+      d.includes("tech")
+    )
+      return "engineering";
+    if (
+      d.includes("management") ||
+      d.includes("gerência") ||
+      d.includes("diretor")
+    )
+      return "management";
+    if (
+      d.includes("legal") ||
+      d.includes("jurídico") ||
+      d.includes("compliance")
+    )
+      return "legal";
     return "support";
   }
 
-  private normalizeCustomerType(customerType: string): "new" | "returning" | "power_user" | "enterprise" | "unknown" {
+  private normalizeCustomerType(
+    customerType: string,
+  ): "new" | "returning" | "power_user" | "enterprise" | "unknown" {
     const c = customerType.toLowerCase();
-    if (c.includes("new") || c.includes("novo") || c.includes("first")) return "new";
-    if (c.includes("returning") || c.includes("recorrente") || c.includes("regular")) return "returning";
-    if (c.includes("power") || c.includes("advanced") || c.includes("expert")) return "power_user";
-    if (c.includes("enterprise") || c.includes("empresarial") || c.includes("corporate")) return "enterprise";
+    if (c.includes("new") || c.includes("novo") || c.includes("first"))
+      return "new";
+    if (
+      c.includes("returning") ||
+      c.includes("recorrente") ||
+      c.includes("regular")
+    )
+      return "returning";
+    if (c.includes("power") || c.includes("advanced") || c.includes("expert"))
+      return "power_user";
+    if (
+      c.includes("enterprise") ||
+      c.includes("empresarial") ||
+      c.includes("corporate")
+    )
+      return "enterprise";
     return "unknown";
   }
 
   /**
    * Basic fallback analysis when AI fails
    */
-  private getBasicFallbackAnalysis(transcription: string, csat?: number): Partial<AiAnalysisResult> {
+  private getBasicFallbackAnalysis(
+    transcription: string,
+    csat?: number,
+  ): Partial<AiAnalysisResult> {
     const basicMetrics = this.calculateBasicMetrics(transcription);
 
     // Simple sentiment based on keywords
     const text = transcription.toLowerCase();
     let sentiment: "positive" | "negative" | "neutral" = "neutral";
 
-    const positiveWords = ["bom", "ótimo", "excelente", "maravilhoso", "perfeito", "adorei", "gostei"];
-    const negativeWords = ["ruim", "péssimo", "terrível", "horrível", "problema", "erro", "falha"];
+    const positiveWords = [
+      "bom",
+      "ótimo",
+      "excelente",
+      "maravilhoso",
+      "perfeito",
+      "adorei",
+      "gostei",
+    ];
+    const negativeWords = [
+      "ruim",
+      "péssimo",
+      "terrível",
+      "horrível",
+      "problema",
+      "erro",
+      "falha",
+    ];
 
-    const positiveCount = positiveWords.filter(word => text.includes(word)).length;
-    const negativeCount = negativeWords.filter(word => text.includes(word)).length;
+    const positiveCount = positiveWords.filter((word) =>
+      text.includes(word),
+    ).length;
+    const negativeCount = negativeWords.filter((word) =>
+      text.includes(word),
+    ).length;
 
     if (positiveCount > negativeCount) sentiment = "positive";
     else if (negativeCount > positiveCount) sentiment = "negative";
