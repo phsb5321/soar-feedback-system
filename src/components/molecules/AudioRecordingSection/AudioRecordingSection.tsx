@@ -55,11 +55,11 @@ export function AudioRecordingSection({
   };
 
   return (
-    <div className={`space-y-4 text-center ${className}`}>
+    <div className={`space-y-4 text-center on-light-bg ${className}`}>
       {/* Status and Timer */}
       <div className="flex flex-col items-center space-y-2">
         <div className="flex items-center justify-center space-x-2">
-          <Text variant="body" style={getStatusColor()}>
+          <Text variant="body" className="on-light-bg" style={getStatusColor()}>
             {getStatusText()}
           </Text>
           {isTranscribing && <LoadingSpinner size="small" color="primary" />}
@@ -84,7 +84,7 @@ export function AudioRecordingSection({
       </div>
 
       {/* Instructions with Help Button */}
-      <div className="space-y-1 relative">
+      <div className="space-y-1 relative on-light-bg">
         {/* Help button for recording instructions */}
         <div className="flex justify-center mb-2">
           <HelpButton
@@ -97,7 +97,11 @@ export function AudioRecordingSection({
           />
         </div>
 
-        <Text variant="caption" style={{ color: "#374151", fontWeight: "500" }}>
+        <Text
+          variant="caption"
+          className="on-light-bg"
+          style={{ color: "#374151", fontWeight: "500" }}
+        >
           {isRecording
             ? "Fale agora e clique novamente para parar"
             : "Clique no microfone e comece a falar"}
@@ -106,6 +110,7 @@ export function AudioRecordingSection({
         {!isRecording && !isTranscribing && (
           <Text
             variant="caption"
+            className="on-light-bg"
             style={{ color: "#4b5563", fontWeight: "500", fontSize: "0.75rem" }}
           >
             Certifique-se de estar em um ambiente silencioso
