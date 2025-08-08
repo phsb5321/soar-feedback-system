@@ -429,19 +429,18 @@ button {
 
 /* ZONE 1: LOGO AREA (Dark Background) - Top of page */
 /* Logo title and subtitle on dark gradient background */
-.logo-zone,
-.logo-zone *,
-.logo-zone h1,
-.logo-zone p {
-  color: #ffffff !important;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-}
-
+.logo-zone p,
 .logo-zone .text-gray-200,
 .logo-zone .text-gray-700,
 .logo-zone .text-gray-400 {
-  color: #f3f4f6 !important;
+  color: #ffffff !important;
   font-weight: 500 !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Preserve logo gradient effect - don't override h1 in logo zone */
+.logo-zone h1 {
+  /* Let the Logo component handle its own gradient styling */
 }
 
 /* ZONE 2: WHITE CARD INTERIOR - All text inside cards/papers */
@@ -493,8 +492,9 @@ button {
 .footer-zone p,
 .footer-zone span,
 .footer-zone div {
-  color: #e5e7eb !important;
+  color: #ffffff !important;
   font-weight: 500 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* ZONE 4: MAIN BACKGROUND AREA (Dark Background) */
@@ -506,16 +506,18 @@ body > main > *:not(.MuiPaper-root) {
 /* Specific targeting for common elements on dark background */
 main .text-center:not(.MuiPaper-root .text-center) p,
 main .text-center:not(.MuiPaper-root .text-center) span {
-  color: #e5e7eb !important;
+  color: #ffffff !important;
   font-weight: 500 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* EMERGENCY OVERRIDES - Last resort rules */
 /* Force light colors for elements definitely on dark background */
 .on-dark-bg,
 .on-dark-bg * {
-  color: #f3f4f6 !important;
+  color: #ffffff !important;
   font-weight: 500 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* Force dark colors for elements definitely on light background */
