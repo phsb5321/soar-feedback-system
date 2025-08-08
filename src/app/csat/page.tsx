@@ -155,18 +155,10 @@ function CSATContent() {
                   className="text-green-600"
                 />
               </div>
-              <Text
-                variant="h3"
-                className="font-bold"
-                style={{ color: "#16a34a" }}
-              >
+              <Text variant="h3" className="font-bold" color="success">
                 Feedback Enviado com Sucesso!
               </Text>
-              <Text
-                variant="body"
-                className="max-w-md"
-                style={{ color: "#6b7280" }}
-              >
+              <Text variant="body" className="max-w-md" color="secondary">
                 Obrigado por sua participação. Sua opinião é muito importante
                 para nós.
               </Text>
@@ -243,14 +235,10 @@ function CSATContent() {
             <div className="space-y-8">
               {/* Header */}
               <div className="text-center relative">
-                <Text
-                  variant="h3"
-                  className="font-bold mb-2"
-                  style={{ color: "#1f2937" }}
-                >
+                <Text variant="h3" className="font-bold mb-2" color="primary">
                   Avalie sua Experiência
                 </Text>
-                <Text variant="body" style={{ color: "#6b7280" }}>
+                <Text variant="body" color="secondary">
                   Sua opinião é muito importante para nós
                 </Text>
 
@@ -269,19 +257,11 @@ function CSATContent() {
 
               {/* Transcription Summary */}
               <div className="space-y-4">
-                <Text
-                  variant="h3"
-                  className="font-semibold"
-                  style={{ color: "#1f2937" }}
-                >
+                <Text variant="h3" className="font-semibold" color="primary">
                   Seu Feedback:
                 </Text>
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
-                  <Text
-                    variant="body"
-                    className="italic"
-                    style={{ color: "#374151" }}
-                  >
+                  <Text variant="body" className="italic" color="secondary">
                     &ldquo;{csatData.transcription}&rdquo;
                   </Text>
                 </div>
@@ -290,14 +270,10 @@ function CSATContent() {
               {/* NPS Rating Section */}
               <div className="space-y-6">
                 <div className="text-center space-y-2">
-                  <Text
-                    variant="h3"
-                    className="font-semibold"
-                    style={{ color: "#1f2937" }}
-                  >
+                  <Text variant="h3" className="font-semibold" color="primary">
                     ⭐ Avalie nossa experiência
                   </Text>
-                  <Text variant="body" style={{ color: "#6b7280" }}>
+                  <Text variant="body" color="secondary">
                     Como foi usar nosso sistema de feedback?
                   </Text>
                 </div>
@@ -323,7 +299,7 @@ function CSATContent() {
                       }}
                     />
                     <div className="text-center">
-                      <Text variant="caption" style={{ color: "#6b7280" }}>
+                      <Text variant="caption" color="secondary">
                         0 = Muito Difícil de Usar | 10 = Muito Fácil de Usar
                       </Text>
                       {npsScore !== null && (
@@ -350,7 +326,6 @@ function CSATContent() {
                   variant="secondary"
                   onClick={handleGoBack}
                   className="w-full sm:w-auto flex items-center justify-center space-x-2"
-                  style={{ color: "#6b7280", borderColor: "#d1d5db" }}
                 >
                   <span className="text-xl">⬅️</span>
                   <span>Voltar</span>
