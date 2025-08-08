@@ -1,5 +1,4 @@
 import { CSSProperties, ReactNode } from "react";
-import { useContrast } from "@/hooks/useContrast";
 
 export interface TextProps {
   children: ReactNode;
@@ -8,8 +7,6 @@ export interface TextProps {
   className?: string;
   as?: "h1" | "h2" | "h3" | "p" | "span" | "div";
   style?: CSSProperties;
-  contrastAware?: boolean;
-  backgroundColor?: string;
 }
 
 export function Text({
@@ -19,8 +16,6 @@ export function Text({
   className = "",
   as,
   style,
-  contrastAware = true,
-  backgroundColor,
 }: TextProps) {
   // Responsive typography with mobile-first approach
   const variantClasses = {
@@ -32,51 +27,26 @@ export function Text({
     code: "font-mono text-xs sm:text-sm bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded leading-normal",
   };
 
-  const contrast = useContrast(backgroundColor);
-
-  // Use contrast-aware colors if enabled
-  const getTextColor = () => {
-    if (!contrastAware) {
-      // Fallback to original classes
-      const colorClasses = {
-        primary: "text-gray-800 dark:text-gray-100",
-        secondary: "text-gray-600 dark:text-gray-300",
-        error: "text-red-700 dark:text-red-400",
-        success: "text-green-700 dark:text-green-400",
-        muted: "text-gray-500 dark:text-gray-400",
-        disabled: "text-gray-400 dark:text-gray-500",
-      };
-      return colorClasses[color];
-    }
-
-    // Use contrast-aware colors - return empty string to use inline styles
-    return "";
+  // Force dark text colors for better contrast
+  const getDarkTextColor = () => {
+    const darkColors = {
+      primary: "#1f2937", // gray-800 - very dark
+      secondary: "#374151", // gray-700 - dark
+      error: "#dc2626", // red-600 - dark red
+      success: "#059669", // emerald-600 - dark green
+      muted: "#4b5563", // gray-600 - medium dark
+      disabled: "#6b7280", // gray-500 - lighter but still readable
+    };
+    return darkColors[color];
   };
 
-  const textColorClass = getTextColor();
-  const contrastStyle =
-    contrastAware && !textColorClass
-      ? {
-          color: (() => {
-            switch (color) {
-              case "primary":
-                return contrast.textColor;
-              case "secondary":
-                return contrast.secondaryTextColor;
-              case "error":
-                return contrast.adjustColor("#dc2626");
-              case "success":
-                return contrast.adjustColor("#15803d");
-              case "muted":
-                return contrast.mutedTextColor;
-              case "disabled":
-                return contrast.palette.disabled;
-              default:
-                return contrast.textColor;
-            }
-          })(),
-        }
-      : {};
+  // Always use dark colors for maximum contrast
+  const textColor = getDarkTextColor();
+
+  const contrastStyle: CSSProperties = {
+    color: textColor,
+    fontWeight: color === "primary" ? "600" : "500", // Make primary text bolder
+  };
 
   // Determine the component to render
   const getComponent = () => {
@@ -88,9 +58,7 @@ export function Text({
   };
 
   const Component = getComponent();
-  const classes = contrastAware
-    ? `${variantClasses[variant]} ${className}`.trim()
-    : `${variantClasses[variant]} ${textColorClass} ${className}`.trim();
+  const classes = `${variantClasses[variant]} ${className}`.trim();
 
   const combinedStyle: CSSProperties = {
     ...contrastStyle,
