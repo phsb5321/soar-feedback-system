@@ -54,7 +54,7 @@ function HomeContent() {
             showSubtitle={true}
             subtitle="Sistema de Avaliação e Feedback"
             showDecorationLine={true}
-            theme="gradient"
+            theme="white"
           />
 
           {/* Help button for welcome/instructions */}
@@ -77,7 +77,7 @@ function HomeContent() {
             variant="caption"
             color="secondary"
             className="text-xs sm:text-sm font-medium"
-            style={{ color: "#374151", fontWeight: "500" }}
+            style={{ color: "#e5e7eb", fontWeight: "500" }}
           >
             Powered by AI • Seguro e Privado
           </Text>
@@ -90,7 +90,7 @@ function HomeContent() {
               variant="caption"
               color="secondary"
               className="text-xs"
-              style={{ color: "#374151", fontWeight: "500" }}
+              style={{ color: "#e5e7eb", fontWeight: "500" }}
             >
               Sistema Online
             </Text>
