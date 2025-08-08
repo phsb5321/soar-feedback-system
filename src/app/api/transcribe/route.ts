@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     if (!file) {
       return NextResponse.json(
         { error: "No audio file provided" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     console.error("Transcription API error:", error);
     return NextResponse.json(
       { error: "Transcription failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
