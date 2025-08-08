@@ -39,9 +39,9 @@ export function AudioRecordingSection({
   };
 
   const getStatusColor = () => {
-    if (isTranscribing) return "text-blue-600";
-    if (isRecording) return "text-red-600";
-    return "text-gray-700";
+    if (isTranscribing) return { color: "#2563eb", fontWeight: "500" };
+    if (isRecording) return { color: "#dc2626", fontWeight: "500" };
+    return { color: "#374151", fontWeight: "500" };
   };
 
   const handleStartRecording = () => {
@@ -59,7 +59,7 @@ export function AudioRecordingSection({
       {/* Status and Timer */}
       <div className="flex flex-col items-center space-y-2">
         <div className="flex items-center justify-center space-x-2">
-          <Text variant="body" className={getStatusColor()}>
+          <Text variant="body" style={getStatusColor()}>
             {getStatusText()}
           </Text>
           {isTranscribing && <LoadingSpinner size="small" color="primary" />}
@@ -97,10 +97,7 @@ export function AudioRecordingSection({
           />
         </div>
 
-        <Text
-          variant="caption"
-          className="text-gray-700 dark:text-gray-400 font-medium"
-        >
+        <Text variant="caption" style={{ color: "#374151", fontWeight: "500" }}>
           {isRecording
             ? "Fale agora e clique novamente para parar"
             : "Clique no microfone e comece a falar"}
@@ -109,7 +106,7 @@ export function AudioRecordingSection({
         {!isRecording && !isTranscribing && (
           <Text
             variant="caption"
-            className="text-gray-700 dark:text-gray-500 text-xs"
+            style={{ color: "#4b5563", fontWeight: "500", fontSize: "0.75rem" }}
           >
             Certifique-se de estar em um ambiente silencioso
           </Text>
