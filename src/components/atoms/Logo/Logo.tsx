@@ -89,7 +89,7 @@ export function Logo({
       case "gradient":
       case "solid":
       default:
-        return "text-gray-600 dark:text-gray-400";
+        return "text-gray-700 dark:text-gray-400";
     }
   };
 
@@ -97,12 +97,12 @@ export function Logo({
     <div className={`text-center ${className}`} style={style}>
       <h1
         className={`
-          ${sizeClasses[size]} 
-          font-bold 
-          drop-shadow-lg 
+          ${sizeClasses[size]}
+          font-bold
+          drop-shadow-lg
           mb-2 sm:mb-3
-          transition-all 
-          duration-300 
+          transition-all
+          duration-300
           ease-in-out
         `}
         style={getLogoStyles()}
@@ -113,12 +113,12 @@ export function Logo({
       {showSubtitle && (
         <p
           className={`
-            ${subtitleSizeClasses[size]} 
+            ${subtitleSizeClasses[size]}
             ${getSubtitleColor()}
-            font-medium 
-            tracking-wide 
+            font-medium
+            tracking-wide
             opacity-80
-            transition-opacity 
+            transition-opacity
             duration-300
           `}
         >
@@ -129,15 +129,15 @@ export function Logo({
       {showDecorationLine && (
         <div
           className={`
-            ${decorationLineClasses[size]} 
-            bg-gradient-to-r 
-            from-blue-500 
-            to-purple-600 
-            rounded-full 
-            mx-auto 
-            mt-3 sm:mt-4 
+            ${decorationLineClasses[size]}
+            bg-gradient-to-r
+            from-blue-500
+            to-purple-600
+            rounded-full
+            mx-auto
+            mt-3 sm:mt-4
             opacity-60
-            transition-all 
+            transition-all
             duration-300
           `}
         />

@@ -99,7 +99,7 @@ export function AudioRecordingSection({
 
         <Text
           variant="caption"
-          className="text-gray-600 dark:text-gray-400 font-medium"
+          className="text-gray-700 dark:text-gray-400 font-medium"
         >
           {isRecording
             ? "Fale agora e clique novamente para parar"
@@ -109,7 +109,7 @@ export function AudioRecordingSection({
         {!isRecording && !isTranscribing && (
           <Text
             variant="caption"
-            className="text-gray-500 dark:text-gray-500 text-xs"
+            className="text-gray-700 dark:text-gray-500 text-xs"
           >
             Certifique-se de estar em um ambiente silencioso
           </Text>

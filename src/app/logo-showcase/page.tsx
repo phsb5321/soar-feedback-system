@@ -8,7 +8,7 @@ export default function LogoShowcase() {
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
             Logo Component Showcase
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-700">
             Demonstrating different variants of the SOAR Logo component
           </p>
         </div>
@@ -21,15 +21,15 @@ export default function LogoShowcase() {
             </h6>
             <div className="space-y-6">
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Small</p>
+                <p className="text-sm text-gray-700 mb-2">Small</p>
                 <Logo size="small" />
               </div>
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Medium</p>
+                <p className="text-sm text-gray-700 mb-2">Medium</p>
                 <Logo size="medium" />
               </div>
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Large</p>
+                <p className="text-sm text-gray-700 mb-2">Large</p>
                 <Logo size="large" />
               </div>
             </div>
@@ -42,11 +42,11 @@ export default function LogoShowcase() {
             </h6>
             <div className="space-y-6">
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Gradient (Default)</p>
+                <p className="text-sm text-gray-700 mb-2">Gradient (Default)</p>
                 <Logo theme="gradient" />
               </div>
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Solid</p>
+                <p className="text-sm text-gray-700 mb-2">Solid</p>
                 <Logo theme="solid" />
               </div>
               <div className="text-center bg-gray-800 p-4 rounded">
@@ -63,15 +63,15 @@ export default function LogoShowcase() {
             </h6>
             <div className="space-y-6">
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">No Subtitle</p>
+                <p className="text-sm text-gray-700 mb-2">No Subtitle</p>
                 <Logo showSubtitle={false} />
               </div>
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Default Subtitle</p>
+                <p className="text-sm text-gray-700 mb-2">Default Subtitle</p>
                 <Logo showSubtitle={true} />
               </div>
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Custom Subtitle</p>
+                <p className="text-sm text-gray-700 mb-2">Custom Subtitle</p>
                 <Logo showSubtitle={true} subtitle="Custom Text Here" />
               </div>
             </div>
@@ -84,13 +84,13 @@ export default function LogoShowcase() {
             </h6>
             <div className="space-y-6">
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm text-gray-700 mb-2">
                   With Decoration Line
                 </p>
                 <Logo showDecorationLine={true} />
               </div>
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">No Decoration Line</p>
+                <p className="text-sm text-gray-700 mb-2">No Decoration Line</p>
                 <Logo showDecorationLine={false} />
               </div>
             </div>
@@ -104,7 +104,7 @@ export default function LogoShowcase() {
           </h6>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="text-center">
-              <p className="text-sm text-gray-600 mb-4">Main Page Usage</p>
+              <p className="text-sm text-gray-700 mb-4">Main Page Usage</p>
               <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6 rounded-lg">
                 <Logo
                   size="large"
@@ -116,7 +116,7 @@ export default function LogoShowcase() {
               </div>
             </div>
             <div className="text-center">
-              <p className="text-sm text-gray-600 mb-4">CSAT Page Usage</p>
+              <p className="text-sm text-gray-700 mb-4">CSAT Page Usage</p>
               <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6 rounded-lg">
                 <Logo
                   size="large"

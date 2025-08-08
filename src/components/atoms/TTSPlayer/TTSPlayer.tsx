@@ -82,7 +82,7 @@ export function TTSPlayer({
   if (!audioUrl) {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
-        <Text variant="body" className="text-gray-600 dark:text-gray-400">
+        <Text variant="body" className="text-gray-700 dark:text-gray-400">
           {text}
         </Text>
       </div>
@@ -128,4 +128,4 @@ export function TTSPlayer({
       </div>
     </div>
   );
-} 
+}

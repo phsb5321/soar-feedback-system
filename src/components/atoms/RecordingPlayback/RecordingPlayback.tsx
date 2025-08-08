@@ -43,7 +43,7 @@ export function RecordingPlayback({
           src={audioUrl}
           onError={(error) => console.error("Recording playback error:", error)}
         />
-        <Text variant="caption" className="text-gray-600">
+        <Text variant="caption" className="text-gray-700">
           🎧 Ouvir gravação
         </Text>
       </div>
