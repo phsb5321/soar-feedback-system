@@ -83,8 +83,9 @@ export function SimpleFeedbackForm({
           backdropFilter: "blur(20px)",
           border: `1px solid ${successBg.borderColor}`,
         }}
+        className="on-light-bg"
       >
-        <div className="text-center space-y-6 relative">
+        <div className="text-center space-y-6 relative on-light-bg">
           {/* Help button for success message */}
           <div className="absolute top-0 right-0">
             <HelpButton
@@ -102,14 +103,14 @@ export function SimpleFeedbackForm({
           </div>
           <Text
             variant="h3"
-            className="font-bold"
+            className="font-bold on-light-bg"
             style={{ color: "#059669", fontWeight: "700" }}
           >
             Feedback Enviado com Sucesso!
           </Text>
           <Text
             variant="body"
-            className="max-w-md"
+            className="max-w-md on-light-bg"
             style={{ color: "#374151", fontWeight: "500" }}
           >
             Obrigado por sua participação. Sua opinião é muito importante para
@@ -151,19 +152,21 @@ export function SimpleFeedbackForm({
             background: `linear-gradient(90deg, ${colors.primary}, ${colors.accent}, ${colors.info}, ${colors.warning})`,
           },
         }}
+        className="on-light-bg"
       >
-        <div className="space-y-8">
+        <div className="space-y-8 on-light-bg">
           {/* Header */}
-          <div className="text-center">
+          <div className="text-center on-light-bg">
             <Text
               variant="h3"
-              className="font-bold mb-2"
+              className="font-bold mb-2 on-light-bg"
               style={{ color: "#1f2937", fontWeight: "700" }}
             >
               🎙️ Sistema de Feedback SOAR
             </Text>
             <Text
               variant="body"
+              className="on-light-bg"
               style={{ color: "#374151", fontWeight: "500" }}
             >
               Grave seu feedback em voz
@@ -171,23 +174,27 @@ export function SimpleFeedbackForm({
           </div>
 
           {/* Audio Recording Section */}
-          <AudioRecordingSection
-            isRecording={isRecording}
-            isTranscribing={isTranscribing}
-            onStartRecording={startRecording}
-            onStopRecording={stopRecording}
-          />
+          <div className="on-light-bg">
+            <AudioRecordingSection
+              isRecording={isRecording}
+              isTranscribing={isTranscribing}
+              onStartRecording={startRecording}
+              onStopRecording={stopRecording}
+            />
+          </div>
 
           {/* Transcription Display Section - Show after recording stops */}
           {!isRecording && transcription && (
             <>
-              <TranscriptionDisplaySection
-                transcription={transcription}
-                audioBlob={audioBlob || undefined}
-              />
+              <div className="on-light-bg">
+                <TranscriptionDisplaySection
+                  transcription={transcription}
+                  audioBlob={audioBlob || undefined}
+                />
+              </div>
 
               {/* Simplified action buttons with icons */}
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 on-light-bg">
                 <Button
                   variant="secondary"
                   onClick={handleReRecord}
