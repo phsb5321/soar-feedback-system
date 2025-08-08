@@ -76,12 +76,12 @@ function HomeContent() {
           <Text
             variant="caption"
             color="secondary"
-            className="text-xs sm:text-sm opacity-70 font-medium"
-            style={{ color: colors.secondary }}
+            className="text-xs sm:text-sm font-medium"
+            style={{ color: "#374151", fontWeight: "500" }}
           >
             Powered by AI • Seguro e Privado
           </Text>
-          <div className="flex items-center justify-center gap-2 opacity-60">
+          <div className="flex items-center justify-center gap-2">
             <div
               className="w-2 h-2 rounded-full animate-pulse"
               style={{ backgroundColor: colors.success }}
@@ -90,7 +90,7 @@ function HomeContent() {
               variant="caption"
               color="secondary"
               className="text-xs"
-              style={{ color: colors.secondary }}
+              style={{ color: "#374151", fontWeight: "500" }}
             >
               Sistema Online
             </Text>
