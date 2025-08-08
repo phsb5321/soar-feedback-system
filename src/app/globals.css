@@ -34,15 +34,15 @@
   --color-primary-950: #172554;
 
   /* Semantic colors */
-  --color-success: #16a34a;
+  --color-success: #15803d;
   --color-warning: #f59e0b;
   --color-error: #dc2626;
   --color-info: #06b6d4;
 
-  /* Text colors - Fixed for proper contrast */
-  --color-text-primary: #1f2937;
-  --color-text-secondary: #4b5563;
-  --color-text-muted: #6b7280;
+  /* Text colors - WCAG AA compliant for accessibility */
+  --color-text-primary: #111827; /* Increased contrast: gray-900 */
+  --color-text-secondary: #374151; /* Increased contrast: gray-700 */
+  --color-text-muted: #4b5563; /* Improved contrast: gray-600 */
   --color-text-disabled: #9ca3af;
   --color-text-inverse: #ffffff;
 
@@ -57,12 +57,12 @@
   --color-border-strong: #d1d5db;
   --color-border-subtle: #f3f4f6;
 
-  /* Legacy support */
+  /* Legacy support - Updated for better contrast */
   --background: #ffffff;
-  --foreground: #1f2937;
-  --primary: #1f2937;
-  --secondary: #4b5563;
-  --accent-blue: #3b82f6;
+  --foreground: #111827;
+  --primary: #111827;
+  --secondary: #374151;
+  --accent-blue: #2563eb;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -282,168 +282,65 @@ button,
 }
 
 /* === ACCESSIBLE TEXT COLOR SYSTEM === */
-/* Centralized color management with guaranteed accessibility */
+/* WCAG AA compliant color system for better accessibility */
 
-/* Primary text visibility fix */
-body {
-  color: #1f2937 !important;
+/* High contrast text colors */
+.text-primary-contrast {
+  color: var(--color-text-primary) !important;
 }
 
-/* Force dark text for content areas */
-main,
-main * {
-  color: #1f2937 !important;
+.text-secondary-contrast {
+  color: var(--color-text-secondary) !important;
 }
 
-/* Base text color enforcement for white/light backgrounds */
+.text-muted-contrast {
+  color: var(--color-text-muted) !important;
+}
+
+/* Semantic colors with proper contrast */
+.text-success-contrast {
+  color: #15803d !important; /* green-700 for better contrast */
+}
+
+.text-error-contrast {
+  color: #b91c1c !important; /* red-700 for better contrast */
+}
+
+.text-info-contrast {
+  color: #1d4ed8 !important; /* blue-700 for better contrast */
+}
+
+/* Material-UI component overrides for accessibility */
 .MuiPaper-root {
-  color: #1f2937 !important;
+  color: var(--color-text-primary);
 }
 
-.MuiPaper-root * {
-  color: #1f2937 !important;
-}
-
-/* Text color overrides using solid colors for visibility */
-.MuiPaper-root .text-primary,
-.MuiPaper-root h1,
-.MuiPaper-root h2,
-.MuiPaper-root h3,
-.MuiPaper-root h4,
-.MuiPaper-root h5,
-.MuiPaper-root h6,
-.MuiPaper-root p,
-.MuiPaper-root span,
-.MuiPaper-root div {
-  color: #1f2937 !important;
-}
-
-.MuiPaper-root .text-secondary,
-.MuiPaper-root .text-xs,
-.MuiPaper-root .text-sm,
-.MuiPaper-root [class*="caption"] {
-  color: #4b5563 !important;
-}
-
-/* Semantic color overrides */
-.MuiPaper-root .text-blue-600,
-.MuiPaper-root .text-blue-500 {
-  color: #2563eb !important;
-}
-
-.MuiPaper-root .text-green-600,
-.MuiPaper-root .text-green-500 {
-  color: #16a34a !important;
-}
-
-.MuiPaper-root .text-red-600,
-.MuiPaper-root .text-red-500 {
-  color: #dc2626 !important;
-}
-
-.MuiPaper-root .text-gray-600 {
-  color: #4b5563 !important;
-}
-
-.MuiPaper-root .text-gray-700 {
-  color: #374151 !important;
-}
-
-/* Form elements */
-.MuiPaper-root input,
-.MuiPaper-root textarea,
-.MuiPaper-root select,
-.MuiPaper-root .MuiTextField-root input,
-.MuiPaper-root .MuiTextField-root textarea,
-.MuiPaper-root .MuiInputBase-root {
-  color: #1f2937 !important;
-}
-
-.MuiPaper-root label,
-.MuiPaper-root .MuiTextField-root label,
-.MuiPaper-root .MuiFormLabel-root {
-  color: #4b5563 !important;
-}
-
-/* Material-UI specific components */
 .MuiPaper-root .MuiRating-iconEmpty {
-  color: #d1d5db !important;
+  color: #d1d5db;
 }
 
 .MuiPaper-root .MuiRating-iconFilled {
-  color: #3b82f6 !important;
+  color: var(--accent-blue);
 }
 
 .MuiPaper-root .MuiRating-iconHover {
-  color: #1d4ed8 !important;
+  color: #1d4ed8;
 }
 
-.MuiPaper-root .MuiChip-root {
-  color: #ffffff !important;
-  background-color: #3b82f6 !important;
+/* Form elements with proper contrast */
+input,
+textarea,
+select,
+.MuiTextField-root input,
+.MuiTextField-root textarea,
+.MuiInputBase-root {
+  color: var(--color-text-primary);
 }
 
-/* Global background color enforcement */
-.bg-white,
-.bg-gray-50,
-.bg-gray-100 {
-  color: #1f2937 !important;
-}
-
-/* Force visibility for all text elements */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-span,
-div,
-button,
-a,
-label {
-  color: #1f2937 !important;
-}
-
-/* Override Tailwind text color classes */
-[class*="text-gray"] {
-  color: #1f2937 !important;
-}
-
-/* Specific overrides for common Tailwind classes */
-.text-gray-600 {
-  color: #4b5563 !important;
-}
-
-.text-gray-700 {
-  color: #374151 !important;
-}
-
-.text-blue-600 {
-  color: #2563eb !important;
-}
-
-.text-red-600 {
-  color: #dc2626 !important;
-}
-
-/* Additional overrides for components */
-.text-primary {
-  color: #1f2937 !important;
-}
-
-.text-secondary {
-  color: #4b5563 !important;
-}
-
-/* Ensure Paper components have proper text color */
-.MuiPaper-root {
-  color: #1f2937 !important;
-}
-
-.MuiPaper-root * {
-  color: inherit !important;
+label,
+.MuiTextField-root label,
+.MuiFormLabel-root {
+  color: var(--color-text-secondary);
 }
 
 /* Accessibility and consistency improvements */
