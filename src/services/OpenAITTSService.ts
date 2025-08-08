@@ -3,9 +3,21 @@ import { existsSync, mkdirSync, unlinkSync, writeFileSync } from "fs";
 import OpenAI from "openai";
 import { join } from "path";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+let openai: OpenAI | null = null;
+
+function getOpenAIClient(): OpenAI {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error(
+        "OPENAI_API_KEY environment variable is missing or empty. Please provide it in your environment variables.",
+      );
+    }
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openai;
+}
 
 /**
  * Generate premium quality MP3 audio file using OpenAI TTS-1-HD
@@ -14,7 +26,7 @@ const openai = new OpenAI({
 export async function generateAudioFile(
   text: string,
   filename: string,
-  voice: "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer" = "alloy"
+  voice: "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer" = "alloy",
 ): Promise<string> {
   try {
     const audioDir = join(process.cwd(), "public", "audio");
@@ -27,11 +39,11 @@ export async function generateAudioFile(
     const filePath = join(audioDir, `${filename}.mp3`);
 
     console.log(
-      `🎵 Generating premium Brazilian Portuguese audio: ${filename}.mp3`
+      `🎵 Generating premium Brazilian Portuguese audio: ${filename}.mp3`,
     );
 
     // Use OpenAI TTS-1-HD with optimal settings for Brazilian Portuguese
-    const mp3 = await openai.audio.speech.create({
+    const mp3 = await getOpenAIClient().audio.speech.create({
       model: "tts-1-hd", // Highest quality model available
       voice: voice,
       input: text,
@@ -44,8 +56,8 @@ export async function generateAudioFile(
 
     console.log(
       `✅ Generated premium audio: ${filename}.mp3 (${Math.round(
-        buffer.length / 1024
-      )}KB) with voice: ${voice}`
+        buffer.length / 1024,
+      )}KB) with voice: ${voice}`,
     );
     return `/audio/${filename}.mp3`;
   } catch (error) {
@@ -59,7 +71,7 @@ export async function generateAudioFile(
  * Forces regeneration to ensure latest quality improvements
  */
 export async function generateAllAudioMessages(
-  forceRegenerate: boolean = false
+  forceRegenerate: boolean = false,
 ): Promise<Record<AudioMessageKey, string>> {
   const results: Partial<Record<AudioMessageKey, string>> = {};
 
@@ -80,7 +92,7 @@ export async function generateAllAudioMessages(
   }
 
   console.log(
-    "🎵 Generating premium Brazilian Portuguese audio with OpenAI TTS-1-HD..."
+    "🎵 Generating premium Brazilian Portuguese audio with OpenAI TTS-1-HD...",
   );
   console.log("🔊 Using optimized voice mapping for natural pt-BR intonation");
 
@@ -89,7 +101,7 @@ export async function generateAllAudioMessages(
     try {
       const voice = messageConfig.voice;
       console.log(
-        `🎤 Generating: ${key} (voice: ${voice}, length: ${messageConfig.text.length} chars)`
+        `🎤 Generating: ${key} (voice: ${voice}, length: ${messageConfig.text.length} chars)`,
       );
       const audioUrl = await generateAudioFile(messageConfig.text, key, voice);
       results[key as AudioMessageKey] = audioUrl;
@@ -104,7 +116,7 @@ export async function generateAllAudioMessages(
 
   console.log("🎉 Premium Brazilian Portuguese audio generation complete!");
   console.log(
-    "🔊 All files generated with optimal intonation and natural pronunciation"
+    "🔊 All files generated with optimal intonation and natural pronunciation",
   );
   return results as Record<AudioMessageKey, string>;
 }
