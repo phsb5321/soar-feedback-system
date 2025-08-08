@@ -48,7 +48,7 @@ function HomeContent() {
         px={{ xs: 2, sm: 4 }}
         className="relative z-10"
       >
-        <div className="mb-6 sm:mb-8 md:mb-10 relative">
+        <div className="mb-6 sm:mb-8 md:mb-10 relative logo-zone">
           <Logo
             size="large"
             showSubtitle={true}
@@ -70,14 +70,15 @@ function HomeContent() {
           </div>
         </div>
 
-        <SimpleFeedbackForm />
+        <div className="card-zone">
+          <SimpleFeedbackForm />
+        </div>
 
-        <div className="mt-6 sm:mt-8 text-center space-y-2">
+        <div className="mt-6 sm:mt-8 text-center space-y-2 footer-zone">
           <Text
             variant="caption"
             color="secondary"
-            className="text-xs sm:text-sm font-medium"
-            style={{ color: "#e5e7eb", fontWeight: "500" }}
+            className="text-xs sm:text-sm font-medium on-dark-bg"
           >
             Powered by AI • Seguro e Privado
           </Text>
@@ -89,8 +90,7 @@ function HomeContent() {
             <Text
               variant="caption"
               color="secondary"
-              className="text-xs"
-              style={{ color: "#e5e7eb", fontWeight: "500" }}
+              className="text-xs on-dark-bg"
             >
               Sistema Online
             </Text>
