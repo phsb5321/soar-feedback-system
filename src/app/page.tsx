@@ -2,10 +2,15 @@
 import { HelpButton, Logo, Text } from "@/components/atoms";
 import { SimpleFeedbackForm } from "@/components/organisms";
 import { AudioProvider, useAudioContext } from "@/contexts/AudioContext";
+import {
+  SmartBackground,
+  useContrastContext,
+} from "@/components/providers/ContrastProvider";
 import { Box } from "@mui/material";
 
 function HomeContent() {
   const { playProtectedPageAudio } = useAudioContext();
+  const { colors, isDarkMode } = useContrastContext();
 
   const handleWelcomeHelp = () => {
     playProtectedPageAudio("welcome").catch(() => {
@@ -14,11 +19,21 @@ function HomeContent() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 transition-colors duration-500 px-4 py-8 sm:px-6 lg:px-8">
+    <SmartBackground
+      contentType="primary"
+      intensity="subtle"
+      className="min-h-screen flex flex-col items-center justify-center transition-colors duration-500 px-4 py-8 sm:px-6 lg:px-8"
+      style={{
+        background: isDarkMode
+          ? `linear-gradient(135deg, ${colors.background} 0%, #1e3a8a 50%, #581c87 100%)`
+          : `linear-gradient(135deg, #eff6ff 0%, #e0e7ff 50%, #f3e8ff 100%)`,
+      }}
+      as="main"
+    >
       <div
-        className="absolute inset-0 opacity-20"
+        className="absolute inset-0 opacity-10"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='${encodeURIComponent(colors.primary)}' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }}
       />
 
@@ -61,19 +76,28 @@ function HomeContent() {
           <Text
             variant="caption"
             color="secondary"
-            className="text-xs sm:text-sm opacity-60 font-medium"
+            className="text-xs sm:text-sm opacity-70 font-medium"
+            style={{ color: colors.secondary }}
           >
             Powered by AI • Seguro e Privado
           </Text>
-          <div className="flex items-center justify-center gap-2 opacity-40">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            <Text variant="caption" color="secondary" className="text-xs">
+          <div className="flex items-center justify-center gap-2 opacity-60">
+            <div
+              className="w-2 h-2 rounded-full animate-pulse"
+              style={{ backgroundColor: colors.success }}
+            />
+            <Text
+              variant="caption"
+              color="secondary"
+              className="text-xs"
+              style={{ color: colors.secondary }}
+            >
               Sistema Online
             </Text>
           </div>
         </div>
       </Box>
-    </main>
+    </SmartBackground>
   );
 }
 
