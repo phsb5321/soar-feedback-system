@@ -61,11 +61,13 @@ export function Logo({
       case "gradient":
         return {
           ...baseStyles,
-          background: "linear-gradient(to right, #3b82f6, #8b5cf6, #ec4899)",
+          background:
+            "linear-gradient(45deg, #60a5fa, #a855f7, #ec4899, #f59e0b)",
           WebkitBackgroundClip: "text",
           backgroundClip: "text",
           WebkitTextFillColor: "transparent",
-          color: "#1f2937", // Fallback color
+          color: "#ffffff", // Bright white fallback for better visibility
+          textShadow: "0 0 20px rgba(255, 255, 255, 0.5)",
         };
       case "white":
         return {
