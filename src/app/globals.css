@@ -429,6 +429,40 @@ button {
   font-weight: 500 !important;
 }
 
+/* Text outside cards on dark backgrounds */
+main p,
+main span,
+main div:not(.MuiPaper-root):not(.MuiPaper-root *) {
+  color: #e5e7eb !important;
+  font-weight: 500 !important;
+}
+
+/* Specific overrides for footer text */
+.text-center p,
+.text-center span {
+  color: #e5e7eb !important;
+  font-weight: 500 !important;
+}
+
+/* Logo subtitle on dark background */
+.text-gray-700,
+.text-gray-400,
+.text-gray-200 {
+  color: #f3f4f6 !important;
+  font-weight: 500 !important;
+}
+
+/* Ensure all text outside white cards is visible */
+body > main *:not(.MuiPaper-root):not(.MuiPaper-root *) {
+  color: #f3f4f6 !important;
+}
+
+/* Override for elements that should stay dark (inside cards) */
+.MuiPaper-root,
+.MuiPaper-root * {
+  color: #1f2937 !important;
+}
+
 /* Loading states */
 .loading-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
