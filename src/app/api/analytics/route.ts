@@ -101,7 +101,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     if (!isConnected) {
       return NextResponse.json(
         { error: "Database connection failed" },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -113,7 +113,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     // Build dynamic WHERE clause based on filters
     let whereClause = "WHERE 1=1";
-    const params: any[] = [];
+    const params: (string | number)[] = [];
 
     if (dateFrom) {
       whereClause += ` AND created_at >= $${params.length + 1}`;
@@ -136,7 +136,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     }
 
     // 1. Overview Statistics
-    const overviewQuery = await db.execute(sql.raw(`
+    const overviewQuery = await db.execute(
+      sql.raw(
+        `
       SELECT
         COUNT(*) as total_feedback,
         COUNT(CASE WHEN ai_processed = true THEN 1 END) as ai_processed_count,
@@ -147,12 +149,17 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           2
         ) as processing_success_rate
       FROM feedback ${whereClause}
-    `, params));
+    `,
+        params,
+      ),
+    );
 
     const overview = overviewQuery.rows[0];
 
     // 2. Sentiment Analysis
-    const sentimentQuery = await db.execute(sql.raw(`
+    const sentimentQuery = await db.execute(
+      sql.raw(
+        `
       SELECT
         ai_sentiment,
         COUNT(*) as count,
@@ -161,10 +168,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       ${whereClause} AND ai_sentiment IS NOT NULL
       GROUP BY ai_sentiment
       ORDER BY count DESC
-    `, params));
+    `,
+        params,
+      ),
+    );
 
     // 3. Intent Analysis
-    const intentQuery = await db.execute(sql.raw(`
+    const intentQuery = await db.execute(
+      sql.raw(
+        `
       SELECT
         ai_intent,
         COUNT(*) as count,
@@ -174,10 +186,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       GROUP BY ai_intent
       ORDER BY count DESC
       LIMIT 10
-    `, params));
+    `,
+        params,
+      ),
+    );
 
     // 4. Priority Distribution
-    const priorityQuery = await db.execute(sql.raw(`
+    const priorityQuery = await db.execute(
+      sql.raw(
+        `
       SELECT
         ai_priority_level,
         COUNT(*) as count
@@ -191,10 +208,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           WHEN 'medium' THEN 3
           WHEN 'low' THEN 4
         END
-    `, params));
+    `,
+        params,
+      ),
+    );
 
     // 5. Department Workload
-    const departmentQuery = await db.execute(sql.raw(`
+    const departmentQuery = await db.execute(
+      sql.raw(
+        `
       SELECT
         ai_department,
         COUNT(*) as count,
@@ -203,10 +225,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       ${whereClause} AND ai_department IS NOT NULL
       GROUP BY ai_department
       ORDER BY count DESC
-    `, params));
+    `,
+        params,
+      ),
+    );
 
     // 6. Top Tags (from JSONB array)
-    const tagsQuery = await db.execute(sql.raw(`
+    const tagsQuery = await db.execute(
+      sql.raw(
+        `
       SELECT
         tag,
         COUNT(*) as count
@@ -216,10 +243,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       GROUP BY tag
       ORDER BY count DESC
       LIMIT 20
-    `, params));
+    `,
+        params,
+      ),
+    );
 
     // 7. Top Topics
-    const topicsQuery = await db.execute(sql.raw(`
+    const topicsQuery = await db.execute(
+      sql.raw(
+        `
       SELECT
         topic,
         COUNT(*) as count
@@ -229,10 +261,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       GROUP BY topic
       ORDER BY count DESC
       LIMIT 15
-    `, params));
+    `,
+        params,
+      ),
+    );
 
     // 8. Product Mentions with Sentiment
-    const productMentionsQuery = await db.execute(sql.raw(`
+    const productMentionsQuery = await db.execute(
+      sql.raw(
+        `
       SELECT
         product,
         COUNT(*) as count,
@@ -243,10 +280,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       GROUP BY product
       ORDER BY count DESC
       LIMIT 10
-    `, params));
+    `,
+        params,
+      ),
+    );
 
     // 9. Feature Requests
-    const featureRequestsQuery = await db.execute(sql.raw(`
+    const featureRequestsQuery = await db.execute(
+      sql.raw(
+        `
       SELECT
         feature,
         COUNT(*) as count,
@@ -257,10 +299,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       GROUP BY feature
       ORDER BY count DESC
       LIMIT 10
-    `, params));
+    `,
+        params,
+      ),
+    );
 
     // 10. Bug Reports
-    const bugReportsQuery = await db.execute(sql.raw(`
+    const bugReportsQuery = await db.execute(
+      sql.raw(
+        `
       SELECT
         bug,
         COUNT(*) as count,
@@ -271,10 +318,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       GROUP BY bug
       ORDER BY count DESC
       LIMIT 10
-    `, params));
+    `,
+        params,
+      ),
+    );
 
     // 11. Customer Insights
-    const customerInsightsQuery = await db.execute(sql.raw(`
+    const customerInsightsQuery = await db.execute(
+      sql.raw(
+        `
       SELECT
         COUNT(CASE WHEN ai_customer_type = 'new' THEN 1 END) as new_customers,
         COUNT(CASE WHEN ai_customer_type = 'returning' THEN 1 END) as returning_customers,
@@ -285,10 +337,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         ROUND(AVG(ai_interaction_quality), 3) as average_interaction_quality
       FROM feedback
       ${whereClause}
-    `, params));
+    `,
+        params,
+      ),
+    );
 
     // 12. Language Distribution
-    const languageQuery = await db.execute(sql.raw(`
+    const languageQuery = await db.execute(
+      sql.raw(
+        `
       SELECT
         ai_language,
         COUNT(*) as count
@@ -296,10 +353,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       ${whereClause} AND ai_language IS NOT NULL
       GROUP BY ai_language
       ORDER BY count DESC
-    `, params));
+    `,
+        params,
+      ),
+    );
 
     // 13. Key Phrases for Word Cloud
-    const keyPhrasesQuery = await db.execute(sql.raw(`
+    const keyPhrasesQuery = await db.execute(
+      sql.raw(
+        `
       SELECT
         phrase,
         COUNT(*) as frequency,
@@ -310,10 +372,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       GROUP BY phrase
       ORDER BY frequency DESC
       LIMIT 50
-    `, params));
+    `,
+        params,
+      ),
+    );
 
     // 14. Time Analysis (last 30 days)
-    const timeAnalysisQuery = await db.execute(sql.raw(`
+    const timeAnalysisQuery = await db.execute(
+      sql.raw(
+        `
       SELECT
         DATE(created_at) as date,
         COUNT(*) as count,
@@ -329,17 +396,25 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       GROUP BY DATE(created_at)
       ORDER BY date DESC
       LIMIT 30
-    `, params));
+    `,
+        params,
+      ),
+    );
 
     // 15. Processing Metrics
-    const processingMetricsQuery = await db.execute(sql.raw(`
+    const processingMetricsQuery = await db.execute(
+      sql.raw(
+        `
       SELECT
         ROUND(AVG(ai_word_count), 0) as average_word_count,
         ROUND(AVG(ai_character_count), 0) as average_character_count,
         ROUND(AVG(ai_readability_score), 3) as average_readability_score
       FROM feedback
       ${whereClause} AND ai_processed = true
-    `, params));
+    `,
+        params,
+      ),
+    );
 
     // Build response
     const analytics: AnalyticsResponse = {
@@ -347,68 +422,88 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         totalFeedback: parseInt(overview.total_feedback) || 0,
         aiProcessedCount: parseInt(overview.ai_processed_count) || 0,
         averageCSAT: parseFloat(overview.average_csat) || 0,
-        processingSuccessRate: parseFloat(overview.processing_success_rate) || 0,
+        processingSuccessRate:
+          parseFloat(overview.processing_success_rate) || 0,
       },
       sentiment: {
-        distribution: sentimentQuery.rows.reduce((acc, row) => {
-          acc[row.ai_sentiment] = parseInt(row.count);
-          return acc;
-        }, {} as Record<string, number>),
-        trends: sentimentQuery.rows.map(row => ({
+        distribution: sentimentQuery.rows.reduce(
+          (acc, row) => {
+            acc[row.ai_sentiment] = parseInt(row.count);
+            return acc;
+          },
+          {} as Record<string, number>,
+        ),
+        trends: sentimentQuery.rows.map((row) => ({
           sentiment: row.ai_sentiment,
           count: parseInt(row.count),
           percentage: parseFloat(row.percentage),
         })),
       },
       intent: {
-        distribution: intentQuery.rows.reduce((acc, row) => {
-          acc[row.ai_intent] = parseInt(row.count);
-          return acc;
-        }, {} as Record<string, number>),
-        topIntents: intentQuery.rows.map(row => ({
+        distribution: intentQuery.rows.reduce(
+          (acc, row) => {
+            acc[row.ai_intent] = parseInt(row.count);
+            return acc;
+          },
+          {} as Record<string, number>,
+        ),
+        topIntents: intentQuery.rows.map((row) => ({
           intent: row.ai_intent,
           count: parseInt(row.count),
           averageCSAT: parseFloat(row.average_csat) || 0,
         })),
       },
       priority: {
-        distribution: priorityQuery.rows.reduce((acc, row) => {
-          acc[row.ai_priority_level] = parseInt(row.count);
-          return acc;
-        }, {} as Record<string, number>),
-        criticalIssues: priorityQuery.rows.find(r => r.ai_priority_level === 'critical')?.count || 0,
-        highPriorityIssues: priorityQuery.rows.find(r => r.ai_priority_level === 'high')?.count || 0,
+        distribution: priorityQuery.rows.reduce(
+          (acc, row) => {
+            acc[row.ai_priority_level] = parseInt(row.count);
+            return acc;
+          },
+          {} as Record<string, number>,
+        ),
+        criticalIssues:
+          priorityQuery.rows.find((r) => r.ai_priority_level === "critical")
+            ?.count || 0,
+        highPriorityIssues:
+          priorityQuery.rows.find((r) => r.ai_priority_level === "high")
+            ?.count || 0,
       },
       departments: {
-        workload: departmentQuery.rows.reduce((acc, row) => {
-          acc[row.ai_department] = parseInt(row.count);
-          return acc;
-        }, {} as Record<string, number>),
-        averageUrgency: departmentQuery.rows.reduce((acc, row) => {
-          acc[row.ai_department] = parseFloat(row.average_urgency);
-          return acc;
-        }, {} as Record<string, number>),
+        workload: departmentQuery.rows.reduce(
+          (acc, row) => {
+            acc[row.ai_department] = parseInt(row.count);
+            return acc;
+          },
+          {} as Record<string, number>,
+        ),
+        averageUrgency: departmentQuery.rows.reduce(
+          (acc, row) => {
+            acc[row.ai_department] = parseFloat(row.average_urgency);
+            return acc;
+          },
+          {} as Record<string, number>,
+        ),
       },
       businessIntelligence: {
-        topTags: tagsQuery.rows.map(row => ({
+        topTags: tagsQuery.rows.map((row) => ({
           tag: row.tag,
           count: parseInt(row.count),
         })),
-        topTopics: topicsQuery.rows.map(row => ({
+        topTopics: topicsQuery.rows.map((row) => ({
           topic: row.topic,
           count: parseInt(row.count),
         })),
-        productMentions: productMentionsQuery.rows.map(row => ({
+        productMentions: productMentionsQuery.rows.map((row) => ({
           product: row.product,
           count: parseInt(row.count),
-          sentiment: row.dominant_sentiment || 'neutral',
+          sentiment: row.dominant_sentiment || "neutral",
         })),
-        featureRequests: featureRequestsQuery.rows.map(row => ({
+        featureRequests: featureRequestsQuery.rows.map((row) => ({
           feature: row.feature,
           count: parseInt(row.count),
-          priority: row.common_priority || 'medium',
+          priority: row.common_priority || "medium",
         })),
-        bugReports: bugReportsQuery.rows.map(row => ({
+        bugReports: bugReportsQuery.rows.map((row) => ({
           bug: row.bug,
           count: parseInt(row.count),
           urgency: parseFloat(row.average_urgency) || 0,
@@ -417,33 +512,49 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       customerInsights: {
         customerTypes: {
           new: parseInt(customerInsightsQuery.rows[0]?.new_customers) || 0,
-          returning: parseInt(customerInsightsQuery.rows[0]?.returning_customers) || 0,
+          returning:
+            parseInt(customerInsightsQuery.rows[0]?.returning_customers) || 0,
           power_user: parseInt(customerInsightsQuery.rows[0]?.power_users) || 0,
-          enterprise: parseInt(customerInsightsQuery.rows[0]?.enterprise_customers) || 0,
-          unknown: parseInt(customerInsightsQuery.rows[0]?.unknown_customers) || 0,
+          enterprise:
+            parseInt(customerInsightsQuery.rows[0]?.enterprise_customers) || 0,
+          unknown:
+            parseInt(customerInsightsQuery.rows[0]?.unknown_customers) || 0,
         },
-        followUpRequired: parseInt(customerInsightsQuery.rows[0]?.follow_up_required) || 0,
-        averageInteractionQuality: parseFloat(customerInsightsQuery.rows[0]?.average_interaction_quality) || 0,
-        languageDistribution: languageQuery.rows.reduce((acc, row) => {
-          acc[row.ai_language] = parseInt(row.count);
-          return acc;
-        }, {} as Record<string, number>),
+        followUpRequired:
+          parseInt(customerInsightsQuery.rows[0]?.follow_up_required) || 0,
+        averageInteractionQuality:
+          parseFloat(
+            customerInsightsQuery.rows[0]?.average_interaction_quality,
+          ) || 0,
+        languageDistribution: languageQuery.rows.reduce(
+          (acc, row) => {
+            acc[row.ai_language] = parseInt(row.count);
+            return acc;
+          },
+          {} as Record<string, number>,
+        ),
       },
-      wordCloud: keyPhrasesQuery.rows.map(row => ({
+      wordCloud: keyPhrasesQuery.rows.map((row) => ({
         phrase: row.phrase,
         frequency: parseInt(row.frequency),
-        sentiment: row.dominant_sentiment || 'neutral',
+        sentiment: row.dominant_sentiment || "neutral",
       })),
       timeAnalysis: {
-        recentTrends: timeAnalysisQuery.rows.map(row => ({
+        recentTrends: timeAnalysisQuery.rows.map((row) => ({
           date: row.date,
           count: parseInt(row.count),
           averageSentiment: parseFloat(row.average_sentiment_score) || 0.5,
         })),
         processingTimes: {
-          averageWordCount: parseInt(processingMetricsQuery.rows[0]?.average_word_count) || 0,
-          averageCharacterCount: parseInt(processingMetricsQuery.rows[0]?.average_character_count) || 0,
-          readabilityScore: parseFloat(processingMetricsQuery.rows[0]?.average_readability_score) || 0,
+          averageWordCount:
+            parseInt(processingMetricsQuery.rows[0]?.average_word_count) || 0,
+          averageCharacterCount:
+            parseInt(processingMetricsQuery.rows[0]?.average_character_count) ||
+            0,
+          readabilityScore:
+            parseFloat(
+              processingMetricsQuery.rows[0]?.average_readability_score,
+            ) || 0,
         },
       },
     };
@@ -459,15 +570,14 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       },
       generatedAt: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error("Analytics API error:", error);
     return NextResponse.json(
       {
         error: "Failed to generate analytics",
-        details: error instanceof Error ? error.message : "Unknown error"
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
