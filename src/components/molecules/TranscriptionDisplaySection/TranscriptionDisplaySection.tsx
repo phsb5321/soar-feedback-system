@@ -44,7 +44,10 @@ export function TranscriptionDisplaySection({
           aria-label="Marcar como lido"
         >
           <span className="text-xl">{hasPlayedOnce ? "✅" : "�️"}</span>
-          <Text variant="caption" className="text-blue-700 font-medium">
+          <Text
+            variant="caption"
+            style={{ color: "#1d4ed8", fontWeight: "600" }}
+          >
             {hasPlayedOnce ? "Lido" : "Marcar como lido"}
           </Text>
         </button>
@@ -74,7 +77,10 @@ export function TranscriptionDisplaySection({
         {!hasPlayedOnce && (
           <div className="mt-4 flex items-center space-x-2 text-blue-600">
             <span className="text-sm">💡</span>
-            <Text variant="caption" className="italic">
+            <Text
+              variant="caption"
+              style={{ color: "#2563eb", fontStyle: "italic" }}
+            >
               Clique em &ldquo;Ouvir&rdquo; para escutar sua transcrição
             </Text>
           </div>
