@@ -1,5 +1,5 @@
 import { Icon } from "@/components/atoms/Icon/Icon";
-import { useAdvancedAudio } from "@/hooks/useAdvancedAudio";
+import { useProtectedAudio } from "@/hooks/useProtectedAudio";
 import { IconButton, Tooltip } from "@mui/material";
 import { useState } from "react";
 
@@ -37,10 +37,10 @@ export function HelpButton({
   disabled = false,
 }: HelpButtonProps) {
   const [isPressed, setIsPressed] = useState(false);
-  const { isPlaying } = useAdvancedAudio();
+  const { isProtectedPlaying } = useProtectedAudio();
 
-  // Disable button when audio is playing or explicitly disabled
-  const isDisabled = disabled || isPlaying;
+  // Disable button when protected audio is playing or explicitly disabled
+  const isDisabled = disabled || isProtectedPlaying;
 
   const getIconSrc = () => {
     switch (icon) {
@@ -121,7 +121,7 @@ export function HelpButton({
 
   return (
     <Tooltip
-      title={isPlaying ? "Aguarde o áudio terminar..." : tooltip}
+      title={isProtectedPlaying ? "Aguarde o áudio terminar..." : tooltip}
       arrow
       placement="top"
     >
@@ -143,7 +143,7 @@ export function HelpButton({
             },
             "&.Mui-disabled": {
               color: "#d1d5db",
-              opacity: isPlaying ? 0.5 : 0.3,
+              opacity: isProtectedPlaying ? 0.5 : 0.3,
             },
           }}
         >

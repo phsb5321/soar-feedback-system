@@ -18,17 +18,25 @@ interface AudioStore {
   playedAudios: Set<string>;
   canPlayAudio: boolean;
 
+  // Protected audio state (cannot be interrupted)
+  isProtectedPlaying: boolean;
+  protectedAudio: HTMLAudioElement | null;
+
   // Actions
   playAudio: (
     messageKey: AudioMessageKey,
-    options?: { priority?: number; force?: boolean }
+    options?: { priority?: number; force?: boolean },
   ) => Promise<boolean>;
   queueAudio: (
     messageKey: AudioMessageKey,
-    options?: { priority?: number; immediate?: boolean }
+    options?: { priority?: number; immediate?: boolean },
   ) => void;
   stopAudio: () => void;
   processQueue: () => Promise<void>;
+
+  // Protected audio actions
+  playProtectedAudio: (messageKey: AudioMessageKey) => Promise<boolean>;
+  stopProtectedAudio: () => void;
 
   // Internal methods
   _playNext: () => Promise<void>;
@@ -44,6 +52,10 @@ export const useAudioStore = create<AudioStore>()(
     queue: [],
     playedAudios: new Set(),
     canPlayAudio: false,
+
+    // Protected audio initial state
+    isProtectedPlaying: false,
+    protectedAudio: null,
 
     // Main play audio method
     playAudio: async (messageKey: AudioMessageKey, options = {}) => {
@@ -114,7 +126,7 @@ export const useAudioStore = create<AudioStore>()(
 
       // Check if already in queue
       const existingIndex = queue.findIndex(
-        (item) => item.messageKey === messageKey
+        (item) => item.messageKey === messageKey,
       );
       if (existingIndex !== -1) {
         console.info(`Audio already in queue: ${messageKey}`);
@@ -130,7 +142,7 @@ export const useAudioStore = create<AudioStore>()(
 
       // Insert based on priority (higher priority first)
       const newQueue = [...queue, queueItem].sort(
-        (a, b) => b.priority - a.priority
+        (a, b) => b.priority - a.priority,
       );
       set({ queue: newQueue });
 
@@ -145,6 +157,95 @@ export const useAudioStore = create<AudioStore>()(
         currentAudio.currentTime = 0;
       }
       set({ isPlaying: false, currentAudio: null });
+    },
+
+    // Play protected audio (cannot be interrupted)
+    playProtectedAudio: async (messageKey: AudioMessageKey) => {
+      const { isEnabled, protectedAudio, _createAudioElement } = get();
+
+      if (!isEnabled) {
+        console.info(`Audio disabled, skipping protected: ${messageKey}`);
+        return false;
+      }
+
+      // Stop any current protected audio
+      if (protectedAudio) {
+        protectedAudio.pause();
+        protectedAudio.currentTime = 0;
+      }
+
+      try {
+        const audio = _createAudioElement(messageKey);
+
+        // Configure protected audio specific handlers with improved event handling
+        const cleanupProtectedAudio = () => {
+          set({ isProtectedPlaying: false, protectedAudio: null });
+        };
+
+        audio.onended = () => {
+          cleanupProtectedAudio();
+          console.log(`Protected audio ended: ${messageKey}`);
+        };
+
+        audio.onerror = (error) => {
+          console.error(`Failed to load protected audio: ${messageKey}`, error);
+          cleanupProtectedAudio();
+        };
+
+        // Add additional event listeners for better completion detection
+        audio.onpause = () => {
+          // If audio is paused and has reached the end, consider it finished
+          if (audio.currentTime >= audio.duration - 0.1) {
+            cleanupProtectedAudio();
+            console.log(
+              `Protected audio completed via pause event: ${messageKey}`,
+            );
+          }
+        };
+
+        audio.onstalled = () => {
+          console.warn(`Protected audio stalled: ${messageKey}`);
+          // Don't automatically cleanup on stall, but log it
+        };
+
+        // Timeout fallback - automatically cleanup after reasonable time
+        const timeoutId = setTimeout(() => {
+          if (get().isProtectedPlaying && get().protectedAudio === audio) {
+            console.warn(
+              `Protected audio timeout reached for: ${messageKey}, auto-cleanup`,
+            );
+            cleanupProtectedAudio();
+          }
+        }, 30000); // 30 second timeout
+
+        // Clear timeout when audio ends naturally
+        audio.addEventListener("ended", () => {
+          clearTimeout(timeoutId);
+        });
+
+        set({ protectedAudio: audio, isProtectedPlaying: true });
+        await audio.play();
+
+        console.log(`Successfully playing protected audio: ${messageKey}`);
+        return true;
+      } catch (error) {
+        console.warn(
+          `Protected audio autoplay blocked for: ${messageKey}`,
+          error,
+        );
+        set({ isProtectedPlaying: false, protectedAudio: null });
+        return false;
+      }
+    },
+
+    // Stop protected audio
+    stopProtectedAudio: () => {
+      const { protectedAudio } = get();
+      if (protectedAudio) {
+        protectedAudio.pause();
+        protectedAudio.currentTime = 0;
+      }
+      set({ isProtectedPlaying: false, protectedAudio: null });
     },
 
     // Process the audio queue
@@ -174,7 +275,7 @@ export const useAudioStore = create<AudioStore>()(
       } catch (error) {
         console.error(
           `Failed to play queued audio: ${nextItem.messageKey}`,
-          error
+          error,
         );
 
         // Retry logic
@@ -185,7 +286,7 @@ export const useAudioStore = create<AudioStore>()(
           };
           set((state) => ({
             queue: [...state.queue, retryItem].sort(
-              (a, b) => b.priority - a.priority
+              (a, b) => b.priority - a.priority,
             ),
           }));
         }
@@ -197,23 +298,33 @@ export const useAudioStore = create<AudioStore>()(
       const audioUrl = getAudioUrl(messageKey);
       const audio = new Audio(audioUrl);
 
-      // Configure event handlers
-      audio.onended = () => {
+      // Configure event handlers with improved completion detection
+      const cleanupRegularAudio = () => {
         set({ isPlaying: false, currentAudio: null });
         // Process next item in queue when current finishes
         setTimeout(() => get().processQueue(), 100);
       };
 
+      audio.onended = () => {
+        cleanupRegularAudio();
+      };
+
       audio.onerror = (error) => {
         console.error(`Failed to load audio: ${audioUrl}`, error);
-        set({ isPlaying: false, currentAudio: null });
-        // Continue processing queue even on error
-        setTimeout(() => get().processQueue(), 100);
+        cleanupRegularAudio();
+      };
+
+      // Additional event listeners for better completion detection
+      audio.onpause = () => {
+        // If audio is paused and has reached the end, consider it finished
+        if (audio.currentTime >= audio.duration - 0.1) {
+          cleanupRegularAudio();
+        }
       };
 
       return audio;
     },
-  }))
+  })),
 );
 
 // Auto-process queue when items are added
@@ -224,5 +335,5 @@ useAudioStore.subscribe(
       // Small delay to allow for state updates
       setTimeout(() => useAudioStore.getState().processQueue(), 50);
     }
-  }
+  },
 );

@@ -5,10 +5,10 @@ import { AudioProvider, useAudioContext } from "@/contexts/AudioContext";
 import { Box } from "@mui/material";
 
 function HomeContent() {
-  const { playPageAudio } = useAudioContext();
+  const { playProtectedPageAudio } = useAudioContext();
 
   const handleWelcomeHelp = () => {
-    playPageAudio("welcome", 8).catch(() => {
+    playProtectedPageAudio("welcome").catch(() => {
       console.info("Welcome audio blocked, proceeding without audio feedback");
     });
   };
