@@ -225,11 +225,12 @@ export class AiFeedbackAnalysisService {
       console.error("AI analysis failed:", error);
 
       // Return basic analysis with error
+      const fallbackAnalysis = this.getBasicFallbackAnalysis(
+        transcription,
+        csat,
+      );
       return {
-        ...this.getBasicFallbackAnalysis(transcription, csat),
-        ...this.calculateBasicMetrics(transcription),
-        modelVersion: this.modelVersion,
-        processedAt: new Date(),
+        ...fallbackAnalysis,
         processingError:
           error instanceof Error ? error.message : "Unknown error",
       };
@@ -548,7 +549,7 @@ Guidelines:
   private getBasicFallbackAnalysis(
     transcription: string,
     csat?: number,
-  ): Partial<AiAnalysisResult> {
+  ): AiAnalysisResult {
     const basicMetrics = this.calculateBasicMetrics(transcription);
 
     // Simple sentiment based on keywords
@@ -596,6 +597,8 @@ Guidelines:
       intentConfidence: 0.3,
       language: "pt",
       languageConfidence: 0.8,
+      wordCount: basicMetrics.wordCount,
+      characterCount: basicMetrics.characterCount,
       readabilityScore: 0.5,
       formalityScore: 0.5,
       urgencyScore: 0.3,
@@ -612,6 +615,8 @@ Guidelines:
       summary: transcription.slice(0, 100) + "...",
       customerType: "unknown",
       interactionQuality: 0.5,
+      modelVersion: this.modelVersion,
+      processedAt: new Date(),
     };
   }
 }
