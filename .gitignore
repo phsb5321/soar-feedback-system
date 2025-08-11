@@ -54,6 +54,35 @@ next-env.d.ts
 # Other
 AI.MD
 
+# Security - Prevent credential exposure
+*.key
+*.pem
+*.p12
+*.pfx
+secrets.json
+config/secrets/
+.secrets/
+**/secrets/
+*.secret
+.password
+passwords.txt
+credentials.json
+auth.json
+**/config/production/
+**/config/staging/
+
+# Database dumps and backups
+*.sql
+*.dump
+*.backup
+backup/
+dumps/
+
+# Logs that might contain sensitive data
+*.log
+logs/
+.logs/
+
 # Playwright
 node_modules/
 /test-results/
